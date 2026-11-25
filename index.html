@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E9E7E1">
+<meta name="description" content="五个国风人格测试：你的灵魂对应哪位历史人物、你在古代是什么身份、你在仙侠世界是什么角色、你的古代天赋技能、你在古代的人生剧本。">
+<title>古风人格测试合集</title>
+<style>
+  :root {
+    --bg: #E9E7E1; --paper: #F7F6F0; --ink: #1F2724; --ink-2: #4E5A56; --ink-3: #85918C;
+    --line: rgba(31, 39, 36, .14); --zhu: #B23A2C;
+    --serif: "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; font-family: var(--serif); color: var(--ink); background: var(--bg);
+    line-height: 1.8; -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 1080px; margin: 0 auto; padding: 56px 20px 72px; }
+  header { position: relative; max-width: 560px; }
+  h1 { margin: 0; font-size: clamp(34px, 9vw, 60px); font-weight: 900; line-height: 1.15; letter-spacing: .02em; }
+  h1 span { display: block; font-size: .5em; font-weight: 500; color: var(--ink-2); letter-spacing: .12em; margin-bottom: 6px; }
+  .seal {
+    position: absolute; top: 0; right: 0; width: 58px; height: 58px; display: grid; place-items: center;
+    background: var(--zhu); color: #FBF4EC; border-radius: 4px; font-weight: 700; font-size: 18px; line-height: 1.1;
+    box-shadow: inset 0 0 0 2px var(--zhu), inset 0 0 0 3.5px rgba(251, 244, 236, .85); transform: rotate(-4deg);
+    writing-mode: vertical-rl; letter-spacing: .1em;
+  }
+  .lead { margin: 22px 0 0; padding-top: 18px; color: var(--ink-2); font-size: 17px; max-width: 26em;
+    border-top: 1px solid #A8864A; border-image: linear-gradient(90deg, #A8864A 0 64px, transparent 64px) 1; }
+  .grid { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 14px; grid-template-columns: 1fr; }
+  @media (min-width: 720px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  .card {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: stretch; height: 100%;
+    padding: 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px;
+    color: inherit; text-decoration: none; position: relative; overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c); }
+  .card:hover { border-color: var(--c); transform: translateY(-2px); }
+  .card:focus-visible { outline: 2px solid var(--zhu); outline-offset: 3px; }
+  .slip {
+    writing-mode: vertical-rl; font-size: 24px; font-weight: 900; letter-spacing: .12em; line-height: 1.1;
+    padding: 12px 8px; border: 1.5px solid var(--ink); box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4px var(--ink);
+    background: #FFFEFA; min-height: 150px;
+  }
+  .body { display: flex; flex-direction: column; }
+  .body h2 { margin: 2px 0 6px; font-size: 18px; line-height: 1.5; }
+  .body p { margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.75; }
+  .meta { margin-top: auto !important; padding-top: 12px; font-size: 13px !important; color: var(--c) !important; letter-spacing: .06em; }
+  footer { margin-top: 40px; font-size: 13px; color: var(--ink-3); }
+  @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1><span>穿越回古代，你会是谁</span>古风人格测试合集</h1>
+    <div class="seal" aria-hidden="true">五合集</div>
+    <p class="lead">五个测试，各四十道生活小问题。不考历史，只问日常，测完可以生成分享海报。</p>
+  </header>
+
+  <ul class="grid">
+    <li><a class="card" style="--c:#24566B" href="01-history-figure.html">
+      <span class="slip" aria-hidden="true">历史人物</span>
+      <span class="body"><h2>测测你的灵魂对应哪位中国历史人物</h2>
+        <p>谋士、帝王、文人、诗人、侠客、将领还是隐士？</p>
+        <p class="meta">18 位历史人物</p></span></a></li>
+    <li><a class="card" style="--c:#9A2F27" href="02-ancient-identity.html">
+      <span class="slip" aria-hidden="true">古代身份</span>
+      <span class="body"><h2>测测你在古代是什么身份</h2>
+        <p>首辅、状元、神医、镖头、首富、御厨，还是闲散王爷？</p>
+        <p class="meta">14 种古代身份</p></span></a></li>
+    <li><a class="card" style="--c:#3B4C8C" href="03-xianxia-role.html">
+      <span class="slip" aria-hidden="true">仙侠角色</span>
+      <span class="body"><h2>测测你在仙侠世界是什么角色</h2>
+        <p>剑修、丹修、阵法师、御兽师、魔尊，还是隐世高人？</p>
+        <p class="meta">15 种仙侠角色</p></span></a></li>
+    <li><a class="card" style="--c:#2E6B5E" href="04-ancient-talent.html">
+      <span class="slip" aria-hidden="true">天赋技能</span>
+      <span class="body"><h2>测测你的古代天赋技能</h2>
+        <p>过目不忘、七步成诗、百步穿杨，还是点石成金？</p>
+        <p class="meta">14 项天赋技能</p></span></a></li>
+    <li><a class="card" style="--c:#6B3456" href="05-life-script.html">
+      <span class="slip" aria-hidden="true">人生剧本</span>
+      <span class="body"><h2>测测你在古代会拥有什么人生剧本</h2>
+        <p>寒门逆袭、权倾朝野、仗剑天涯，还是咸鱼躺赢？</p>
+        <p class="meta">13 种人生剧本</p></span></a></li>
+  </ul>
+
+  <footer>每个测试的作答进度都会自动保存在你的浏览器里，可以随时回来接着答。</footer>
+</main>
+</body>
+</html>

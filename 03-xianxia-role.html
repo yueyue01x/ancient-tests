@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E4E6EE">
+<meta name="description" content="四十道题，测出你在仙侠世界里的角色：天才剑修、炼丹宗师、阵法大师、御兽师、魔尊、千年狐妖，还是深藏不露的隐世高人？">
+<title>测测你在仙侠世界是什么角色</title>
+<style>
+/* =========================================================
+ * 古风人格测试 —— 通用样式
+ * 底色（--bg）与主色（--qing）由各测试在 index.html 中覆盖；墨色字、朱砂印、泥金线为共用
+ * ========================================================= */
+
+:root {
+  --bg: #E4EBE6;          /* 天青 */
+  --paper: #F7F6F0;       /* 素绢 */
+  --paper-2: #EEF1EC;
+  --ink: #1F2724;         /* 墨 */
+  --ink-2: #4E5A56;       /* 淡墨 */
+  --ink-3: #85918C;       /* 远山 */
+  --line: rgba(31, 39, 36, .14);
+  --line-strong: rgba(31, 39, 36, .32);
+  --qing: #24566B;        /* 石青 */
+  --zhu: #B23A2C;         /* 朱砂 */
+  --jin: #A8864A;         /* 泥金 */
+  --type: #24566B;        /* 结果页随人物类型变化 */
+  --type-soft: #DCE4EC;
+
+  --serif: "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif CN",
+           "Songti SC", "STSong", "SimSun", "Noto Serif CJK TC", serif;
+
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--ink);
+  background-color: var(--bg);
+  /* 绢本纹理 */
+  background-image:
+    radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .12  0 0 0 0 .15  0 0 0 0 .14  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button { font: inherit; color: inherit; }
+img { max-width: 100%; display: block; }
+[hidden] { display: none !important; }
+
+:focus-visible {
+  outline: 2px solid var(--zhu);
+  outline-offset: 3px;
+}
+
+/* 远山 */
+.mountains {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 34vh;
+  max-height: 320px;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity .6s var(--ease);
+}
+body[data-screen="quiz"] .mountains,
+body[data-screen="result"] .mountains { opacity: .55; }
+
+#app { position: relative; z-index: 1; }
+
+/* ---------- 屏幕切换 ---------- */
+.screen { display: none; min-height: 100vh; min-height: 100dvh; }
+.screen.is-active { display: block; animation: screenIn .5s var(--ease) both; }
+@keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- 通用按钮 ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 17px;
+  letter-spacing: .18em;
+  text-decoration: none;
+  transition: background-color .2s, color .2s, border-color .2s, transform .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--ink); color: var(--paper); }
+.btn-primary:hover { background: var(--qing); }
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  font-size: 15px;
+  letter-spacing: .08em;
+  min-height: 46px;
+  padding: 0 16px;
+}
+.btn-ghost:hover { border-color: var(--ink); background: rgba(255, 255, 255, .4); }
+.btn-text {
+  background: none;
+  color: var(--ink-2);
+  min-height: 44px;
+  font-size: 15px;
+  letter-spacing: .06em;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 6px;
+}
+.btn-text:hover { color: var(--ink); text-decoration-color: var(--ink); }
+
+/* ---------- 印章 ---------- */
+.seal {
+  display: inline-grid;
+  place-items: center;
+  background: var(--zhu);
+  color: #FBF4EC;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px var(--zhu), inset 0 0 0 3.5px rgba(251, 244, 236, .85);
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+}
+
+/* =========================================================
+ * 首页
+ * ========================================================= */
+.home-grid {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 64px 24px calc(140px + var(--safe-b));
+}
+.home-main { position: relative; max-width: 520px; }
+
+.home-title { margin: 0; font-weight: 400; line-height: 1.2; }
+.ht-line { display: block; }
+.ht-a, .ht-b { font-size: 30px; letter-spacing: .12em; color: var(--ink-2); font-weight: 500; }
+.ht-b { margin-top: 2px; }
+.ht-c {
+  margin-top: 10px;
+  font-size: clamp(42px, 12.4vw, 76px);
+  font-weight: 900;
+  letter-spacing: .02em;
+  line-height: 1.08;
+  color: var(--ink);
+}
+.seal-home {
+  position: absolute;
+  top: 2px; right: 0;
+  width: 58px; height: 58px;
+  font-size: 19px;
+  grid-template-rows: 1fr 1fr;
+  padding: 8px 0;
+  transform: rotate(-4deg);
+}
+.seal-home i { font-style: normal; letter-spacing: .1em; }
+
+.home-desc {
+  margin: 28px 0 0;
+  max-width: 26em;
+  font-size: 17px;
+  color: var(--ink-2);
+  padding-top: 22px;
+  border-top: 1px solid var(--jin);
+  border-image: linear-gradient(90deg, var(--jin) 0 64px, transparent 64px) 1;
+}
+
+.home-cta { margin-top: 34px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.home-cta .btn-primary { min-width: 220px; }
+
+.home-meta {
+  margin: 18px 0 0;
+  display: flex; flex-wrap: wrap; gap: 6px 18px;
+  font-size: 14px; color: var(--ink-3);
+}
+
+.type-seals {
+  list-style: none;
+  margin: 40px 0 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 7), minmax(0, 46px));
+  gap: 8px;
+}
+.type-seals li {
+  aspect-ratio: 1;
+  display: grid; place-items: center;
+  border-radius: 3px;
+  color: #FBF7F0;
+  font-size: 15px;
+  line-height: 1.05;
+  letter-spacing: .05em;
+  writing-mode: vertical-rl;
+  box-shadow: inset 0 0 0 2px var(--c), inset 0 0 0 3px rgba(251, 247, 240, .7);
+  background: var(--c);
+}
+
+/* 右侧名录（桌面端） */
+.home-roll { display: none; }
+
+@media (min-width: 900px) {
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 64px;
+    align-items: center;
+    min-height: 100vh;
+    padding-top: 48px;
+    padding-bottom: 160px;
+  }
+  .ht-a, .ht-b { font-size: 34px; }
+  .seal-home { width: 66px; height: 66px; font-size: 21px; }
+  .home-roll {
+    display: block;
+    padding: 28px 26px;
+    background: rgba(247, 246, 240, .7);
+    border: 1px solid var(--line);
+    box-shadow: 0 0 0 6px rgba(247, 246, 240, .5), 0 0 0 7px var(--line);
+  }
+  .roll-inner {
+    display: flex;
+    flex-direction: row-reverse;   /* 自右向左，如展卷 */
+    gap: 20px;
+  }
+  .roll-col {
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+    margin: 0;
+    font-size: 21px;
+    letter-spacing: .18em;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .roll-col b {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3em;
+    color: var(--c);
+    margin-block-end: .9em;
+    padding-block: .3em;
+    border-inline-start: 2px solid var(--c);
+    padding-inline-start: 4px;
+  }
+  .roll-col i { font-style: normal; color: var(--ink-3); margin-block: .15em; }
+}
+
+/* =========================================================
+ * 答题
+ * ========================================================= */
+.quiz-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 18px 18px calc(120px + var(--safe-b));
+}
+
+.quiz-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 48px;
+}
+.btn-back {
+  justify-self: start;
+  background: none; border: 0; cursor: pointer;
+  padding: 8px 4px;
+  font-size: 15px;
+  color: var(--ink-2);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-back::before {
+  content: "";
+  width: 8px; height: 8px;
+  border-left: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  margin-right: 2px;
+}
+.btn-back:hover { color: var(--ink); }
+
+.quiz-chapter { margin: 0; font-size: 15px; letter-spacing: .2em; color: var(--ink-2); }
+.quiz-chapter b { font-weight: 700; color: var(--qing); margin-right: .6em; }
+.quiz-chapter.flash { animation: chFlash .9s var(--ease); }
+@keyframes chFlash {
+  0% { opacity: 0; transform: translateY(-6px); }
+  100% { opacity: 1; transform: none; }
+}
+.quiz-count { margin: 0; justify-self: end; font-size: 14px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.quiz-count b { font-size: 20px; color: var(--ink); font-weight: 700; margin-right: 3px; }
+
+/* 进度：五卷五段 */
+.progress {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 8px 0 22px;
+}
+.pg-seg { display: flex; flex-direction: column; gap: 6px; }
+.pg-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(31, 39, 36, .1);
+  overflow: hidden;
+}
+.pg-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--qing);
+  border-radius: 2px;
+  transition: width .45s var(--ease);
+}
+.pg-seg span {
+  font-size: 12px;
+  letter-spacing: .2em;
+  color: var(--ink-3);
+  text-align: center;
+  transition: color .3s;
+}
+.pg-seg.is-current span { color: var(--qing); font-weight: 700; }
+.pg-seg.is-full .pg-bar i { background: var(--ink); }
+
+/* 题卡：仿装裱的双线框 */
+.q-card {
+  position: relative;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 26px 20px 22px;
+  box-shadow: 0 0 0 5px rgba(247, 246, 240, .6), 0 0 0 6px var(--line), 0 18px 40px -28px rgba(31, 39, 36, .45);
+}
+.q-index {
+  margin: 0 0 6px;
+  font-size: 14px;
+  letter-spacing: .3em;
+  color: var(--zhu);
+}
+.q-text {
+  margin: 0 0 22px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.55;
+  letter-spacing: .02em;
+  outline: none;
+}
+
+.q-options { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.opt {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 14px 16px;
+  min-height: 60px;
+  background: rgba(255, 255, 255, .5);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  transition: border-color .18s, background-color .18s, color .18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.opt-mark {
+  flex: none;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 14px;
+  color: var(--ink-2);
+  transition: inherit;
+}
+@media (hover: hover) {
+  .opt:hover { border-color: var(--qing); background: #fff; }
+  .opt:hover .opt-mark { border-color: var(--qing); color: var(--qing); }
+}
+.opt.is-picked { background: var(--qing); border-color: var(--qing); color: #F4F7F5; }
+.opt.is-picked .opt-mark { background: #F4F7F5; border-color: #F4F7F5; color: var(--qing); }
+.opt.just-picked { animation: pickPulse .28s var(--ease); }
+@keyframes pickPulse { 0% { transform: scale(.985); } 100% { transform: none; } }
+
+.quiz-hint { margin: 20px 0 0; text-align: center; font-size: 13px; color: var(--ink-3); }
+@media (hover: none) { .quiz-hint { display: none; } }
+
+/* 题卡切换 */
+.q-card.out-left  { animation: outLeft .2s ease-in both; }
+.q-card.out-right { animation: outRight .2s ease-in both; }
+.q-card.in-right  { animation: inRight .34s var(--ease) both; }
+.q-card.in-left   { animation: inLeft .34s var(--ease) both; }
+@keyframes outLeft  { to { opacity: 0; transform: translateX(-28px); } }
+@keyframes outRight { to { opacity: 0; transform: translateX(28px); } }
+@keyframes inRight  { from { opacity: 0; transform: translateX(28px); } }
+@keyframes inLeft   { from { opacity: 0; transform: translateX(-28px); } }
+
+@media (min-width: 640px) {
+  .quiz-wrap { padding-top: 40px; }
+  .q-card { padding: 36px 36px 30px; }
+  .q-text { font-size: 26px; }
+  .opt { font-size: 17px; padding: 16px 20px; }
+}
+
+/* =========================================================
+ * 分析中
+ * ========================================================= */
+.screen-loading.is-active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  padding: 24px;
+}
+.ink-loader { position: relative; width: 120px; height: 120px; }
+.ink-loader i {
+  position: absolute; inset: 0;
+  margin: auto;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0;
+  animation: inkSpread 2.1s var(--ease) infinite;
+}
+.ink-loader i:nth-child(2) { animation-delay: .7s; background: var(--qing); }
+.ink-loader i:nth-child(3) { animation-delay: 1.4s; }
+@keyframes inkSpread {
+  0% { transform: scale(.2); opacity: .5; }
+  70% { opacity: .08; }
+  100% { transform: scale(5); opacity: 0; }
+}
+.loading-text { margin: 0; font-size: 18px; letter-spacing: .25em; color: var(--ink-2); min-height: 1.8em; text-align: center; }
+
+/* =========================================================
+ * 结果
+ * ========================================================= */
+.result-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 22px 14px calc(140px + var(--safe-b));
+}
+.result-card {
+  position: relative;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 26px 20px 22px;
+  box-shadow: 0 0 0 5px rgba(247, 246, 240, .7), 0 0 0 6px var(--line), 0 24px 60px -36px rgba(31, 39, 36, .5);
+  overflow: hidden;
+}
+.result-card::before {
+  /* 顶部色带：人物类型色 */
+  content: "";
+  position: absolute; left: 0; right: 0; top: 0;
+  height: 5px;
+  background: var(--type);
+}
+
+.rc-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+}
+.rc-pre { margin: 4px 0 0; font-size: 14px; letter-spacing: .2em; color: var(--ink-3); }
+.rc-type {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--type);
+  letter-spacing: .12em;
+}
+.rc-type b { font-size: 22px; letter-spacing: .3em; margin-right: .3em; }
+.rc-slogan {
+  margin: 16px 0 0;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: .02em;
+  color: var(--ink);
+}
+.rc-match { margin: 18px 0 0; display: flex; align-items: baseline; gap: 10px; }
+.rc-match span { font-size: 13px; letter-spacing: .2em; color: var(--ink-3); }
+.rc-match b { font-size: 40px; font-weight: 900; line-height: 1; color: var(--type); font-variant-numeric: tabular-nums; }
+.rc-match b small { font-size: 18px; font-weight: 700; margin-left: 2px; }
+
+/* 题签：竖排人名 */
+.rc-slip {
+  position: relative;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 4px;
+  padding: 14px 10px 30px;
+  background: #FFFEFA;
+  border: 1.5px solid var(--ink);
+  box-shadow: inset 0 0 0 4px #FFFEFA, inset 0 0 0 5px var(--ink);
+  min-height: 210px;
+}
+.rc-name {
+  writing-mode: vertical-rl;
+  font-size: 46px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  line-height: 1.05;
+  color: var(--ink);
+  margin: 0;
+}
+.rc-style {
+  writing-mode: vertical-rl;
+  font-size: 13px;
+  letter-spacing: .25em;
+  color: var(--ink-2);
+  line-height: 1.4;
+  padding-top: 6px;
+  margin: 0;
+}
+.rc-slip.len-4 .rc-name { font-size: 40px; }
+.rc-slip.len-5 .rc-name { font-size: 33px; }
+.rc-slip.len-6 .rc-name { font-size: 28px; }
+.rc-seal {
+  position: absolute;
+  left: -14px; bottom: -14px;
+  width: 50px; height: 50px;
+  font-size: 17px;
+  writing-mode: vertical-rl;
+  letter-spacing: .06em;
+  transform: rotate(-6deg);
+}
+
+.rc-facts {
+  margin: 22px 0 0;
+  display: flex; flex-wrap: wrap; gap: 6px 20px;
+  font-size: 14px; color: var(--ink-2);
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.rc-facts span b { color: var(--ink); font-weight: 700; margin-left: .4em; }
+
+.rc-tags { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.rc-tags li {
+  padding: 3px 12px;
+  font-size: 14px;
+  letter-spacing: .06em;
+  color: var(--type);
+  background: var(--type-soft);
+  border-radius: 2px;
+}
+
+.rc-radar {
+  margin: 20px 0 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  justify-items: center;
+}
+.rc-radar svg { width: 100%; max-width: 330px; height: auto; overflow: visible; }
+.rc-radar-note { margin: 0; font-size: 14px; color: var(--ink-2); text-align: center; }
+.rc-radar-note b { color: var(--type); }
+
+.rc-sec { margin: 22px 0 0; }
+.rc-sec h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .25em;
+  color: var(--type);
+  display: flex; align-items: center; gap: 10px;
+}
+.rc-sec h3::before {
+  content: "";
+  width: 7px; height: 7px;
+  background: var(--zhu);
+  transform: rotate(45deg);
+  flex: none;
+}
+.rc-sec p { margin: 0; font-size: 16px; color: var(--ink); text-align: justify; }
+.rc-sec p + p { margin-top: 8px; }
+.rc-sec .rc-dyn { color: var(--ink-2); }
+
+.rc-egg {
+  margin: 22px 0 0;
+  padding: 16px 16px 16px 18px;
+  background: var(--paper-2);
+  border-left: 3px solid var(--jin);
+}
+.rc-egg h3 { color: var(--jin); }
+.rc-egg h3::before { background: var(--jin); }
+
+.rc-rel { margin: 22px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rc-rel > div {
+  padding: 14px 14px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .45);
+}
+.rc-rel em {
+  display: inline-grid; place-items: center;
+  font-style: normal;
+  width: 26px; height: 26px;
+  font-size: 13px;
+  margin-right: 8px;
+  vertical-align: 2px;
+}
+.rc-rel .rel-foe em { background: var(--ink); box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 3px rgba(251, 244, 236, .8); }
+.rc-rel strong { font-size: 18px; }
+.rc-rel p { margin: 8px 0 0; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+
+.rc-second {
+  margin: 22px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px dashed var(--line-strong);
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.rc-second b { color: var(--ink); font-size: 17px; }
+
+.rc-foot {
+  margin: 22px -20px -22px;
+  padding: 14px 20px;
+  background: var(--ink);
+  color: rgba(247, 246, 240, .8);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  font-size: 13px;
+  letter-spacing: .08em;
+}
+.rc-foot b { color: var(--paper); font-weight: 500; min-width: 0; }
+.rc-foot span { white-space: nowrap; flex: none; }
+@media (max-width: 420px) { .rc-foot { font-size: 12px; letter-spacing: .02em; } }
+
+/* 揭晓：唯一一处编排动效——题签落下，印章盖上 */
+.result-card.reveal .rc-slip { animation: slipIn .7s var(--ease) .1s both; }
+.result-card.reveal .rc-seal { animation: stamp .5s cubic-bezier(.3, 1.6, .5, 1) .75s both; }
+.result-card.reveal .rc-slogan,
+.result-card.reveal .rc-match { animation: fadeUp .6s var(--ease) .45s both; }
+@keyframes slipIn { from { opacity: 0; transform: translateY(-22px); } to { opacity: 1; transform: none; } }
+@keyframes stamp { 0% { opacity: 0; transform: scale(2.2) rotate(-14deg); } 100% { opacity: 1; transform: scale(1) rotate(-6deg); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.result-actions {
+  margin-top: 26px;
+  display: flex; flex-direction: column; align-items: stretch; gap: 10px;
+}
+.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.result-actions .btn-text { align-self: center; }
+
+@media (min-width: 640px) {
+  .result-wrap { padding-top: 48px; }
+  .result-card { padding: 38px 40px 30px; }
+  .rc-foot { margin: 28px -40px -30px; padding: 16px 40px; }
+  .rc-slogan { font-size: 25px; }
+  .rc-name { font-size: 58px; }
+  .rc-slip.len-4 .rc-name { font-size: 50px; }
+  .rc-slip.len-5 .rc-name { font-size: 42px; }
+  .rc-slip.len-6 .rc-name { font-size: 36px; }
+  .rc-slip { min-height: 250px; padding: 18px 14px 34px; }
+  .rc-match b { font-size: 48px; }
+  .rc-radar { grid-template-columns: 1fr; }
+}
+
+/* =========================================================
+ * 弹层
+ * ========================================================= */
+.modal {
+  position: fixed; inset: 0;
+  z-index: 50;
+  background: rgba(20, 26, 24, .62);
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px;
+  animation: screenIn .25s ease both;
+}
+.modal-panel {
+  background: var(--paper);
+  border-radius: 4px;
+  width: 100%;
+  max-height: calc(100dvh - 36px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-poster { max-width: 440px; padding: 16px; text-align: center; }
+.modal-poster img { width: 100%; height: auto; border-radius: 2px; box-shadow: 0 0 0 1px var(--line); }
+.modal-tip { margin: 12px 0 4px; font-size: 14px; color: var(--ink-2); }
+.modal-actions { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; }
+
+.modal-gallery { max-width: 640px; padding: 0 0 18px; }
+.gallery-head {
+  position: sticky; top: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  z-index: 1;
+}
+.gallery-head h2 { margin: 0; font-size: 19px; letter-spacing: .2em; }
+.gallery-body { padding: 4px 20px 0; }
+.g-group { margin-top: 18px; }
+.g-group h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  letter-spacing: .3em;
+  color: var(--c);
+  display: flex; align-items: center; gap: 8px;
+}
+.g-group h3::before { content: ""; width: 14px; height: 14px; border-radius: 2px; background: var(--c); }
+.g-item {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.g-item strong { font-size: 18px; line-height: 1.5; }
+.g-item strong small { display: block; font-size: 12px; font-weight: 400; color: var(--ink-3); letter-spacing: .1em; }
+.g-item p { margin: 0; font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+.g-item.is-me { background: var(--type-soft); margin: 0 -10px; padding: 10px; border-radius: 2px; }
+.g-me { display: inline-grid; place-items: center; margin-left: 6px; width: 20px; height: 20px; font-size: 12px; font-weight: 400; color: #fff; background: var(--zhu); border-radius: 2px; vertical-align: 3px; }
+
+/* ---------- 提示 ---------- */
+.toast {
+  position: fixed;
+  left: 50%; bottom: calc(28px + var(--safe-b));
+  transform: translate(-50%, 20px);
+  z-index: 60;
+  padding: 10px 20px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 3px;
+  font-size: 15px;
+  letter-spacing: .06em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s var(--ease);
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+.noscript { position: fixed; inset: auto 0 0; margin: 0; padding: 16px; background: var(--zhu); color: #fff; text-align: center; z-index: 99; }
+
+/* ---------- 减少动效 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+</style>
+<style>:root{--bg:#E4E6EE;--qing:#3B4C8C;}</style>
+</head>
+<body>
+
+<svg class="mountains" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="mFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color:var(--qing);stop-opacity:.16"/>
+      <stop offset="1" style="stop-color:var(--qing);stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="mMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color:var(--ink);stop-opacity:.16"/>
+      <stop offset=".8" style="stop-color:var(--ink);stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="mNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color:var(--ink);stop-opacity:.22"/>
+      <stop offset="1" style="stop-color:var(--ink);stop-opacity:.02"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#mFar)" d="M0 196 C 110 168 190 112 296 146 S 470 86 566 128 S 752 52 862 116 S 1072 98 1164 138 S 1336 104 1440 146 L1440 320 L0 320 Z"/>
+  <path fill="url(#mMid)" d="M0 246 C 92 222 176 178 262 208 S 424 156 522 198 S 706 230 818 188 S 1004 146 1104 198 S 1304 232 1440 198 L1440 320 L0 320 Z"/>
+  <path fill="url(#mNear)" d="M0 292 C 156 262 262 272 382 252 S 604 282 724 264 S 982 240 1122 270 S 1342 282 1440 262 L1440 320 L0 320 Z"/>
+</svg>
+
+<main id="app">
+
+  <!-- ============ 首页 ============ -->
+  <section class="screen screen-home is-active" id="home" aria-labelledby="homeTitle">
+    <div class="home-grid">
+      <div class="home-main">
+        <h1 class="home-title" id="homeTitle">
+          <span class="ht-line ht-a">测测你在</span>
+          <span class="ht-line ht-b">仙侠世界里</span>
+          <span class="ht-line ht-c">是什么角色</span>
+        </h1>
+        <span class="seal seal-home" aria-hidden="true"><i>四十</i><i>问</i></span>
+        <p class="home-desc">一朝踏入修仙界，你会走哪条道？四十个关于日常与心性的问题，替你找到命定的修行之路。</p>
+
+        <div class="home-cta">
+          <button class="btn btn-primary" id="btnStart" type="button">开始测试</button>
+          <button class="btn btn-text" id="btnResume" type="button" hidden></button>
+        </div>
+        <p class="home-meta"><span>约 5 分钟</span><span>15 种仙侠角色</span><span>7 维灵根检测</span></p>
+
+        <ul class="type-seals" id="typeSeals" aria-label="结果类别"></ul>
+      </div>
+
+      <aside class="home-roll" aria-label="可能测出的结果">
+        <div class="roll-inner" id="homeRoll"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ 答题 ============ -->
+  <section class="screen screen-quiz" id="quiz" aria-label="答题">
+    <div class="quiz-wrap">
+      <header class="quiz-top">
+        <button class="btn-back" id="btnBack" type="button">上一问</button>
+        <p class="quiz-chapter" id="quizChapter"><b id="chNo">卷一</b><span id="chName"></span></p>
+        <p class="quiz-count"><b id="qNow">1</b><span id="qTotal">/ 40</span></p>
+      </header>
+
+      <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0" aria-label="答题进度"></div>
+
+      <article class="q-card" id="qCard">
+        <p class="q-index" id="qIndex">第一问</p>
+        <h2 class="q-text" id="qText" tabindex="-1"></h2>
+        <ol class="q-options" id="qOptions"></ol>
+      </article>
+
+      <p class="quiz-hint">点选即进入下一问；电脑上可按 1–4 作答，← 返回</p>
+    </div>
+  </section>
+
+  <!-- ============ 分析中 ============ -->
+  <section class="screen screen-loading" id="loading" aria-live="polite">
+    <div class="ink-loader" aria-hidden="true"><i></i><i></i><i></i></div>
+    <p class="loading-text" id="loadingText"></p>
+  </section>
+
+  <!-- ============ 结果 ============ -->
+  <section class="screen screen-result" id="result" aria-label="测试结果">
+    <div class="result-wrap">
+      <div class="result-card" id="resultCard"></div>
+      <div class="result-actions">
+        <button class="btn btn-primary" id="btnPoster" type="button">生成分享海报</button>
+        <div class="action-row">
+          <button class="btn btn-ghost" id="btnCopy" type="button">复制结果文案</button>
+          <button class="btn btn-ghost" id="btnGallery" type="button">仙侠角色图鉴</button>
+        </div>
+        <button class="btn btn-text" id="btnRestart" type="button">重新测试</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 分享海报 -->
+<div class="modal" id="posterModal" hidden>
+  <div class="modal-panel modal-poster" role="dialog" aria-modal="true" aria-label="分享海报">
+    <img id="posterImg" alt="测试结果分享海报">
+    <p class="modal-tip">手机长按图片即可保存；电脑点“下载海报”</p>
+    <div class="modal-actions">
+      <a class="btn btn-primary" id="posterDownload" download="测试结果.png" href="#">下载海报</a>
+      <button class="btn btn-text" type="button" data-close>关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 图鉴 -->
+<div class="modal" id="galleryModal" hidden>
+  <div class="modal-panel modal-gallery" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+    <div class="gallery-head">
+      <h2 id="galleryTitle">仙侠角色图鉴</h2>
+      <button class="btn btn-text" type="button" data-close>关闭</button>
+    </div>
+    <div class="gallery-body" id="galleryBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<noscript><p class="noscript">这个测试需要开启 JavaScript 才能运行。</p></noscript>
+
+<script>
+/* =========================================================
+ * 测测你在仙侠世界是什么角色 —— 数据文件
+ * 七种灵根：剑(锋芒) 丹(沉稳) 阵(谋算) 灵(灵性) 情(羁绊) 道(清心) 狂(不羁)
+ * 每个选项：主维度 +2，次维度 +1
+ * ========================================================= */
+
+/* 页面文案与配色 */
+var CONFIG = {
+  id: 'xianxia-role',
+  title: '测测你在仙侠世界是什么角色',
+  shortName: '我的仙侠角色',
+  pageDesc: '四十道题，测出你在仙侠世界里的角色：天才剑修、炼丹宗师、阵法大师、御兽师、魔尊、千年狐妖，还是深藏不露的隐世高人？',
+  theme: { bg: '#E4E6EE', primary: '#3B4C8C' },          /* 月白 + 靛青 */
+  titleLines: ['测测你在', '仙侠世界里', '是什么角色'],
+  homeDesc: '一朝踏入修仙界，你会走哪条道？四十个关于日常与心性的问题，替你找到命定的修行之路。',
+  homeMeta: ['约 5 分钟', '15 种仙侠角色', '7 维灵根检测'],
+  resultPre: '踏入修仙界，你是',
+  matchLabel: '仙缘契合度',
+  facts: [['所在', 'era'], ['道号', 'title'], ['道途', 'type']],
+  sections: { traits: '性格特点', reason: '为何是你', hidden: '隐藏天赋', egg: '趣味彩蛋', modern: '如果在现代' },
+  rel: [{ label: '道友', seal: '友' }, { label: '劫数', seal: '劫' }],
+  radarLabel: '你的七维灵根',
+  reason: {
+    lead: '在七种灵根里，你的“{a}”和“{b}”最为突出，',
+    both: '恰好是{name}最看重的两种资质。',
+    one: '其中“{dim}”，正是{name}的立道之本。',
+    none: '这套组合，注定你会走上{name}这条路。'
+  },
+  second: '你的另一条修行路是{type}：',
+  posterFoot: '在仙侠世界我是{name}，你呢？',
+  copy: '我测出来在仙侠世界的角色是【{name}】（{type}，{title}）',
+  copyAsk: '你在仙侠世界是什么角色？',
+  loading: ['正在打开山门', '检测你的灵根', '推演你的修行之路', '赐下道号'],
+  galleryTitle: '仙侠角色图鉴'
+};
+
+var DIMS = [
+  { k: '剑', n: '锋芒', d: '果断直接，敢打敢拼' },
+  { k: '丹', n: '沉稳', d: '耐心细致，慢工出细活' },
+  { k: '阵', n: '谋算', d: '善于布局，理性缜密' },
+  { k: '灵', n: '灵性', d: '直觉敏锐，亲近万物' },
+  { k: '情', n: '羁绊', d: '重情护短，心软嘴硬' },
+  { k: '道', n: '清心', d: '自律超然，宠辱不惊' },
+  { k: '狂', n: '不羁', d: '叛逆随性，不服规矩' }
+];
+
+var CHAPTERS = [
+  { no: '卷一', name: '凡尘', sub: '看你在人间怎样过日子' },
+  { no: '卷二', name: '问心', sub: '看你怎样做事' },
+  { no: '卷三', name: '同门', sub: '看你怎样待人' },
+  { no: '卷四', name: '历劫', sub: '看你怎样渡过难关' },
+  { no: '卷五', name: '证道', sub: '看你想成为怎样的人' }
+];
+
+var QUESTIONS = [
+  /* ---------- 卷一 凡尘 ---------- */
+  { ch: 0, q: '早上醒来，你的第一件事是？', o: [
+    ['立刻起床，雷厉风行', { 剑: 2, 道: 1 }],
+    ['先躺着把今天要做的事过一遍', { 阵: 2, 丹: 1 }],
+    ['看看窗外的天，摸摸身边的猫', { 灵: 2, 情: 1 }],
+    ['再睡五分钟，谁也别管我', { 狂: 2, 灵: 1 }]
+  ]},
+  { ch: 0, q: '你吃饭的习惯更像哪一种？', o: [
+    ['边吃边看窗外，常常吃着吃着就走神了', { 灵: 2, 道: 1 }],
+    ['细嚼慢咽，讲究营养搭配', { 丹: 2, 道: 1 }],
+    ['一定要和喜欢的人一起吃', { 情: 2, 灵: 1 }],
+    ['吃得很少，清淡就好', { 道: 2, 丹: 1 }]
+  ]},
+  { ch: 0, q: '你的手机桌面是什么样的？', o: [
+    ['井井有条，按功能分好了文件夹', { 阵: 2, 丹: 1 }],
+    ['一张喜欢的人或宠物的照片', { 情: 2, 灵: 1 }],
+    ['乱七八糟，但我知道每样东西在哪', { 狂: 2, 灵: 1 }],
+    ['极简，只留几个必需的应用', { 道: 2, 阵: 1 }]
+  ]},
+  { ch: 0, q: '周末你更想怎么过？', o: [
+    ['去打一场球或者比一场赛', { 剑: 2, 狂: 1 }],
+    ['在家研究一道新菜或一个新爱好', { 丹: 2, 灵: 1 }],
+    ['陪家人朋友，去哪儿都行', { 情: 2, 道: 1 }],
+    ['一个人去没去过的地方乱逛', { 狂: 2, 剑: 1 }]
+  ]},
+  { ch: 0, q: '买东西的时候，你通常？', o: [
+    ['看准了就买，从不纠结', { 剑: 2, 狂: 1 }],
+    ['反复对比参数、看评价', { 阵: 2, 丹: 1 }],
+    ['跟着感觉走，第一眼喜欢最重要', { 灵: 2, 情: 1 }],
+    ['能不买就不买，东西越少越清净', { 道: 2, 丹: 1 }]
+  ]},
+  { ch: 0, q: '你养植物或宠物的方式是？', o: [
+    ['按时浇水喂食，记录得一清二楚', { 丹: 2, 阵: 1 }],
+    ['天天和它说话，当成家人', { 情: 2, 灵: 1 }],
+    ['养什么都长得特别好，说不清为什么', { 灵: 2, 道: 1 }],
+    ['随它去吧，让它们自由生长', { 狂: 2, 道: 1 }]
+  ]},
+  { ch: 0, q: '你最喜欢哪种天气？', o: [
+    ['晴空万里，适合出门干大事', { 剑: 2, 情: 1 }],
+    ['细雨绵绵，适合待在屋里慢慢做事', { 丹: 2, 道: 1 }],
+    ['电闪雷鸣，莫名觉得很兴奋', { 狂: 2, 剑: 1 }],
+    ['大雾弥漫，像走进了另一个世界', { 灵: 2, 阵: 1 }]
+  ]},
+  { ch: 0, q: '朋友们怎么形容你的房间？', o: [
+    ['像实验室，什么都分门别类', { 阵: 2, 丹: 1 }],
+    ['很温馨，到处都是回忆', { 情: 2, 灵: 1 }],
+    ['简单干净，像个修行的地方', { 道: 2, 丹: 1 }],
+    ['很有个性，别人看不懂', { 狂: 2, 灵: 1 }]
+  ]},
+
+  /* ---------- 卷二 问心 ---------- */
+  { ch: 1, q: '面对一道从没见过的难题，你会？', o: [
+    ['直接上手试，错了再说', { 剑: 2, 狂: 1 }],
+    ['先查资料，找规律', { 阵: 2, 丹: 1 }],
+    ['凭直觉，第一反应往往就是对的', { 灵: 2, 剑: 1 }],
+    ['不急，先放一放，答案自己会冒出来', { 道: 2, 灵: 1 }]
+  ]},
+  { ch: 1, q: '做一件需要很长时间的事，你会？', o: [
+    ['一鼓作气，熬夜也要做完', { 剑: 2, 狂: 1 }],
+    ['拆成小目标，每天推进一点', { 丹: 2, 阵: 1 }],
+    ['看状态，灵感来了效率爆表', { 灵: 2, 狂: 1 }],
+    ['不急不躁，享受过程本身', { 道: 2, 丹: 1 }]
+  ]},
+  { ch: 1, q: '你最看重的品质是？', o: [
+    ['果断', { 剑: 2, 道: 1 }],
+    ['耐心', { 丹: 2, 道: 1 }],
+    ['智慧', { 阵: 2, 灵: 1 }],
+    ['真诚', { 情: 2, 灵: 1 }]
+  ]},
+  { ch: 1, q: '别人要你按他的方法做事，而你有更好的办法，你会？', o: [
+    ['直接说出来，据理力争', { 剑: 2, 阵: 1 }],
+    ['先按他的做，再悄悄优化', { 阵: 2, 丹: 1 }],
+    ['直接用我的方法，结果会证明一切', { 狂: 2, 剑: 1 }],
+    ['无所谓，条条大路通罗马', { 道: 2, 情: 1 }]
+  ]},
+  { ch: 1, q: '做重要决定时，你最依赖什么？', o: [
+    ['逻辑推演', { 阵: 2, 丹: 1 }],
+    ['内心的感觉', { 灵: 2, 情: 1 }],
+    ['会不会影响身边的人', { 情: 2, 道: 1 }],
+    ['这件事能不能让我更自由', { 狂: 2, 道: 1 }]
+  ]},
+  { ch: 1, q: '计划突然被打乱，你会？', o: [
+    ['迅速调整，立刻执行新方案', { 剑: 2, 阵: 1 }],
+    ['有点焦虑，需要时间重新规划', { 丹: 2, 情: 1 }],
+    ['反而兴奋，即兴发挥我最在行', { 狂: 2, 灵: 1 }],
+    ['顺其自然，计划本来就赶不上变化', { 道: 2, 灵: 1 }]
+  ]},
+  { ch: 1, q: '你的学习方式更接近？', o: [
+    ['实战派，在做中学', { 剑: 2, 狂: 1 }],
+    ['系统派，从基础一步步打牢', { 丹: 2, 阵: 1 }],
+    ['悟性派，一点就通', { 灵: 2, 道: 1 }],
+    ['跟人学，喜欢有师父带着', { 情: 2, 丹: 1 }]
+  ]},
+  { ch: 1, q: '你最想拥有哪件法宝？', o: [
+    ['一把削铁如泥的剑', { 剑: 2, 狂: 1 }],
+    ['一只能炼化万物的丹炉', { 丹: 2, 阵: 1 }],
+    ['一张能困住千军万马的阵图', { 阵: 2, 道: 1 }],
+    ['一面能照见人心的镜子', { 灵: 2, 情: 1 }]
+  ]},
+
+  /* ---------- 卷三 同门 ---------- */
+  { ch: 2, q: '宗门里来了一位新同门，你会？', o: [
+    ['主动带他熟悉环境', { 情: 2, 道: 1 }],
+    ['先观察一阵，看看他是什么样的人', { 阵: 2, 灵: 1 }],
+    ['拉他比试一场，看看本事', { 剑: 2, 狂: 1 }],
+    ['不太在意，各修各的道', { 道: 2, 狂: 1 }]
+  ]},
+  { ch: 2, q: '朋友心情不好，你通常会？', o: [
+    ['陪着他，什么都不说也行', { 情: 2, 道: 1 }],
+    ['帮他分析问题，找解决办法', { 阵: 2, 丹: 1 }],
+    ['带他出去疯玩一场', { 狂: 2, 剑: 1 }],
+    ['他还没开口，我就看出哪里不对了', { 灵: 2, 情: 1 }]
+  ]},
+  { ch: 2, q: '在团队里，你更像？', o: [
+    ['冲锋陷阵的先锋', { 剑: 2, 情: 1 }],
+    ['运筹帷幄的军师', { 阵: 2, 道: 1 }],
+    ['后勤保障，大家的定心丸', { 丹: 2, 情: 1 }],
+    ['独行侠，单干效率更高', { 狂: 2, 剑: 1 }]
+  ]},
+  { ch: 2, q: '你和好朋友的相处模式是？', o: [
+    ['嘴上互损，关键时刻两肋插刀', { 情: 2, 剑: 1 }],
+    ['君子之交淡如水', { 道: 2, 丹: 1 }],
+    ['心有灵犀，一个眼神就懂', { 灵: 2, 情: 1 }],
+    ['我带你玩，你跟着就好', { 狂: 2, 剑: 1 }]
+  ]},
+  { ch: 2, q: '有人欺负你的朋友，你会？', o: [
+    ['当场出手，没得商量', { 剑: 2, 情: 1 }],
+    ['记下这笔账，找机会让他付出代价', { 阵: 2, 狂: 1 }],
+    ['先把朋友护在身后，别的再说', { 情: 2, 丹: 1 }],
+    ['劝朋友别往心里去，因果自有报应', { 道: 2, 灵: 1 }]
+  ]},
+  { ch: 2, q: '你最受不了哪种人？', o: [
+    ['磨磨唧唧的人', { 剑: 2, 狂: 1 }],
+    ['毛毛躁躁的人', { 丹: 2, 道: 1 }],
+    ['说话没有逻辑的人', { 阵: 2, 丹: 1 }],
+    ['冷漠无情的人', { 情: 2, 灵: 1 }]
+  ]},
+  { ch: 2, q: '聚会时，你通常是？', o: [
+    ['提议玩游戏、带气氛的那个', { 狂: 2, 情: 1 }],
+    ['在角落里和一两个人聊得很深', { 灵: 2, 情: 1 }],
+    ['照顾大家，端茶倒水的那个', { 情: 2, 丹: 1 }],
+    ['早早离开，回去做自己的事', { 道: 2, 阵: 1 }]
+  ]},
+  { ch: 2, q: '别人第一次见你，常觉得你？', o: [
+    ['锋芒毕露，不好惹', { 剑: 2, 狂: 1 }],
+    ['温和稳重，很靠谱', { 丹: 2, 情: 1 }],
+    ['有点神秘，看不透', { 灵: 2, 阵: 1 }],
+    ['很酷，不太合群', { 狂: 2, 道: 1 }]
+  ]},
+
+  /* ---------- 卷四 历劫 ---------- */
+  { ch: 3, q: '遇到重大挫折时，你会？', o: [
+    ['咬牙硬扛，越挫越勇', { 剑: 2, 狂: 1 }],
+    ['闭关反省，慢慢恢复', { 道: 2, 丹: 1 }],
+    ['找最亲近的人倾诉', { 情: 2, 灵: 1 }],
+    ['复盘哪里出了错，下次绕过去', { 阵: 2, 丹: 1 }]
+  ]},
+  { ch: 3, q: '非常生气的时候，你会？', o: [
+    ['当场发作，一点就炸', { 狂: 2, 剑: 1 }],
+    ['表面平静，心里已经想好了对策', { 阵: 2, 道: 1 }],
+    ['很受伤，难过比生气更多', { 情: 2, 灵: 1 }],
+    ['深呼吸，告诉自己不值得', { 道: 2, 丹: 1 }]
+  ]},
+  { ch: 3, q: '你最害怕的是？', o: [
+    ['输', { 剑: 2, 狂: 1 }],
+    ['失去重要的人', { 情: 2, 灵: 1 }],
+    ['一切失去控制', { 阵: 2, 丹: 1 }],
+    ['被困在一个地方，哪儿也去不了', { 狂: 2, 灵: 1 }]
+  ]},
+  { ch: 3, q: '如果你有心魔，它最可能来自？', o: [
+    ['求而不得的执念', { 情: 2, 狂: 1 }],
+    ['想赢怕输的好胜心', { 剑: 2, 阵: 1 }],
+    ['想得太多，算得太细', { 阵: 2, 灵: 1 }],
+    ['好像没有，我挺想得开的', { 道: 2, 丹: 1 }]
+  ]},
+  { ch: 3, q: '被人误会的时候，你会？', o: [
+    ['当面说清楚', { 剑: 2, 情: 1 }],
+    ['懒得解释，懂的人自然懂', { 道: 2, 狂: 1 }],
+    ['拿出证据，让事实说话', { 阵: 2, 丹: 1 }],
+    ['很委屈，但会先想想对方为什么误会', { 情: 2, 灵: 1 }]
+  ]},
+  { ch: 3, q: '熬过一段很难的日子之后，你最想做什么？', o: [
+    ['找人痛痛快快比一场', { 剑: 2, 狂: 1 }],
+    ['回到熟悉的地方，好好休养', { 丹: 2, 情: 1 }],
+    ['一个人去山里，看看云和树', { 灵: 2, 道: 1 }],
+    ['和最重要的人吃一顿饭', { 情: 2, 丹: 1 }]
+  ]},
+  { ch: 3, q: '渡劫时天雷劈下来，你的第一反应是？', o: [
+    ['拔剑迎上去', { 剑: 2, 狂: 1 }],
+    ['阵法早就布好了，按计划应对', { 阵: 2, 丹: 1 }],
+    ['闭眼静心，劈就劈吧', { 道: 2, 灵: 1 }],
+    ['骂一句老天，硬扛', { 狂: 2, 剑: 1 }]
+  ]},
+  { ch: 3, q: '如果人生能重来一次，你最想？', o: [
+    ['更沉得住气一点', { 丹: 2, 道: 1 }],
+    ['更珍惜身边的人', { 情: 2, 道: 1 }],
+    ['更早想清楚自己要什么', { 阵: 2, 道: 1 }],
+    ['不重来，现在这样挺好', { 道: 2, 灵: 1 }]
+  ]},
+
+  /* ---------- 卷五 证道 ---------- */
+  { ch: 4, q: '你理想中的修炼地点是？', o: [
+    ['剑气纵横的悬崖之巅', { 剑: 2, 狂: 1 }],
+    ['安静的丹房，炉火常年不熄', { 丹: 2, 道: 1 }],
+    ['灵气充沛的深山老林', { 灵: 2, 道: 1 }],
+    ['人声鼎沸的红尘俗世', { 情: 2, 狂: 1 }]
+  ]},
+  { ch: 4, q: '你想要哪种坐骑？', o: [
+    ['一柄飞剑', { 剑: 2, 道: 1 }],
+    ['一只通人性的灵兽', { 灵: 2, 情: 1 }],
+    ['一朵慢悠悠的祥云', { 道: 2, 丹: 1 }],
+    ['一条黑龙，越霸气越好', { 狂: 2, 剑: 1 }]
+  ]},
+  { ch: 4, q: '修成之后，你最想做什么？', o: [
+    ['天下第一，再无敌手', { 剑: 2, 狂: 1 }],
+    ['守护想守护的人', { 情: 2, 剑: 1 }],
+    ['参透天地大道', { 道: 2, 阵: 1 }],
+    ['自由自在，想去哪就去哪', { 狂: 2, 灵: 1 }]
+  ]},
+  { ch: 4, q: '你最想学哪种仙术？', o: [
+    ['御剑术', { 剑: 2, 狂: 1 }],
+    ['炼丹术', { 丹: 2, 情: 1 }],
+    ['阵法与符箓', { 阵: 2, 灵: 1 }],
+    ['与万物通灵', { 灵: 2, 道: 1 }]
+  ]},
+  { ch: 4, q: '下面哪一句最打动你？', o: [
+    ['一剑霜寒十四州', { 剑: 2, 狂: 1 }],
+    ['上善若水，水善利万物而不争', { 道: 2, 丹: 1 }],
+    ['运筹帷幄之中，决胜千里之外', { 阵: 2, 丹: 1 }],
+    ['此情可待成追忆', { 情: 2, 灵: 1 }]
+  ]},
+  { ch: 4, q: '你希望修仙界的人怎么称呼你？', o: [
+    ['剑尊', { 剑: 2, 道: 1 }],
+    ['丹圣', { 丹: 2, 情: 1 }],
+    ['阵皇', { 阵: 2, 狂: 1 }],
+    ['那个谁也管不住的家伙', { 狂: 2, 灵: 1 }]
+  ]},
+  { ch: 4, q: '如果只能带一样东西进修仙界，你会带？', o: [
+    ['一本写满笔记的书', { 阵: 2, 丹: 1 }],
+    ['家人朋友的照片', { 情: 2, 灵: 1 }],
+    ['一只用顺手的小丹炉', { 丹: 2, 阵: 1 }],
+    ['一包种子，到哪儿都能种出花来', { 灵: 2, 丹: 1 }]
+  ]},
+  { ch: 4, q: '最后一问：你修仙的初心是？', o: [
+    ['变强', { 剑: 2, 狂: 1 }],
+    ['长生', { 丹: 2, 道: 1 }],
+    ['护人', { 情: 2, 剑: 1 }],
+    ['随心所欲，不受任何束缚', { 狂: 2, 道: 1 }]
+  ]}
+];
+
+/* 七条道途的配色 */
+var TYPES = {
+  '剑道': { color: '#2E4B6E', soft: '#DEE5EE', name: '霜蓝' },
+  '丹器': { color: '#9A4A2C', soft: '#F2E2DA', name: '丹赭' },
+  '阵符': { color: '#7A6220', soft: '#F0E9D4', name: '符金' },
+  '灵兽': { color: '#3E7A55', soft: '#DDEBE2', name: '翠' },
+  '宗门': { color: '#4A3F7A', soft: '#E4E1F0', name: '紫' },
+  '妖魔': { color: '#7A2340', soft: '#F1DCE3', name: '绛' },
+  '逍遥': { color: '#4F717B', soft: '#DEE8EB', name: '烟青' }
+};
+
+/* 结果档案：p 为七维画像（1-10） */
+var RESULTS = [
+  {
+    id: 'jianxiu', name: '天才剑修', type: '剑道', era: '天剑峰', style: '一剑霜寒十四州',
+    title: '孤鸿剑',
+    p: { 剑: 10, 丹: 2, 阵: 3, 灵: 5, 情: 4, 道: 5, 狂: 6 },
+    slogan: '我只出一剑，但一剑就够了。',
+    tags: ['天赋型', '好胜', '直来直去', '专一'],
+    traits: '你做事干脆利落，认准目标就全力以赴，最讨厌拖泥带水。你好胜心强，也有足够的天赋撑起这份骄傲。你对喜欢的事有近乎偏执的专注，一旦投入，就能心无旁骛。',
+    reason: '剑修是修仙界最纯粹的一条路：不靠法宝、不靠丹药，只靠手中一剑和一颗不退的心。你的锋芒与专注，正是天生剑骨。',
+    hidden: '你的隐藏天赋是一往无前。别人还在犹豫值不值得，你已经出剑了。',
+    egg: '今天大家熟悉的“飞剑”“御剑”，在民国作家还珠楼主的《蜀山剑侠传》里就已写得淋漓尽致。这部 1932 年开始连载的小说，被视为现代仙侠小说的开山之作。',
+    modern: '电竞职业选手，或者在一个领域死磕到顶尖的天才少年。',
+    friend: { name: '炼器宗师', line: '你手里那把剑，是他熬了三年才铸成的。' },
+    foe: { name: '心魔', line: '你最大的对手，从来都是那个不肯服输的自己。' }
+  },
+  {
+    id: 'danxiu', name: '炼丹宗师', type: '丹器', era: '丹霞峰丹房', style: '九转金丹，一炉千年',
+    title: '丹圣',
+    p: { 剑: 2, 丹: 10, 阵: 5, 灵: 5, 情: 3, 道: 6, 狂: 2 },
+    slogan: '火候到了，一切自然水到渠成。',
+    tags: ['耐心', '精细', '稳', '研究型'],
+    traits: '你耐得住性子，愿意为一件事反复试验、慢慢打磨。你做事讲究火候和分寸，很少冒进。你对细节要求极高，相信好东西都是熬出来的。',
+    reason: '炼丹讲究药材、火候与时机，一炉丹动辄炼上数月，差一点就前功尽弃。你的沉稳和钻研精神，正是丹道宗师最难得的资质。',
+    hidden: '你的隐藏天赋是慢就是快。别人急着出结果，你却在一步步把根基打牢。',
+    egg: '中国古代的炼丹术没能炼出长生不老药，却意外催生了火药：炼丹家在炼制丹药时发现，硫黄、硝石和木炭混在一起会燃烧爆炸，这就是黑火药的雏形。',
+    modern: '新药研发科学家，一种药做十年也不嫌长。',
+    friend: { name: '医修', line: '你炼的丹，他最懂怎么用。' },
+    foe: { name: '炸炉', line: '九十九天的心血，有时就毁在最后一刻。' }
+  },
+  {
+    id: 'zhenfa', name: '阵法大师', type: '阵符', era: '万象阵台', style: '一子落下，满盘皆活',
+    title: '布阵先生',
+    p: { 剑: 3, 丹: 6, 阵: 10, 灵: 4, 情: 2, 道: 5, 狂: 3 },
+    slogan: '你看到的是一块石头，我看到的是一座大阵。',
+    tags: ['逻辑怪', '布局者', '冷静', '细节控'],
+    traits: '你思维缜密，习惯先搭好框架再动手，任何事情在你脑子里都是一张结构图。你冷静理性，不爱冒险，更喜欢把一切掌控在计划之内。你也许不是冲在最前面的人，却往往是决定胜负的那个。',
+    reason: '阵法讲究方位、推演和环环相扣，一处算错，满盘皆输。你的谋算能力和耐心，正适合在幕后布下一座让人寸步难行的大阵。',
+    hidden: '你的隐藏天赋是系统思维。你能看见事物之间的联系，把一盘散沙组织成一个整体。',
+    egg: '传说诸葛亮创制了“八阵图”，杜甫写诗赞叹“功盖三分国，名成八阵图”。重庆奉节的江边至今还有一处相传是八阵图遗迹的石堆。',
+    modern: '系统架构师或者顶尖程序员，一张架构图能撑起千万用户。',
+    friend: { name: '一宗之主', line: '他守护宗门，靠的就是你布下的护山大阵。' },
+    foe: { name: '不按套路出牌的人', line: '你算尽万种变化，就怕对方根本不讲道理。' }
+  },
+  {
+    id: 'fulu', name: '符箓奇才', type: '阵符', era: '符箓堂', style: '一笔成符，百无禁忌',
+    title: '鬼画符',
+    p: { 剑: 5, 丹: 3, 阵: 7, 灵: 8, 情: 4, 道: 2, 狂: 6 },
+    slogan: '规矩是用来学的，也是用来改的。',
+    tags: ['鬼点子多', '灵感型', '手快', '爱折腾'],
+    traits: '你脑子转得快，点子一个接一个，常常能想出别人想不到的办法。你喜欢尝试新东西，不太愿意按部就班。你学东西快，也爱在学会之后加点自己的花样。',
+    reason: '画符讲究一气呵成，既要懂规则，也要有灵气和手感。你的灵性、谋算和那点不安分，正适合在一张黄纸上画出惊天动地的符。',
+    hidden: '你的隐藏天赋是随机应变。计划被打乱时，别人慌了，你反而更兴奋。',
+    egg: '道教的符箓一派源远流长，东汉张道陵创立的“五斗米道”就以符水治病、传道收徒。张道陵也被后世尊称为“张天师”。',
+    modern: '创意总监或者产品经理，一拍脑门就是一个爆款点子。',
+    friend: { name: '阵法大师', line: '他布阵，你补符，一个稳一个奇。' },
+    foe: { name: '朱砂涨价', line: '画一张符的成本，比你想象中贵多了。' }
+  },
+  {
+    id: 'lianqi', name: '炼器宗师', type: '丹器', era: '地火熔炉', style: '千锤百炼，器成通灵',
+    title: '铸剑师',
+    p: { 剑: 7, 丹: 7, 阵: 6, 灵: 4, 情: 3, 道: 3, 狂: 4 },
+    slogan: '好东西，都是一锤一锤砸出来的。',
+    tags: ['动手狂人', '务实', '硬核', '匠心'],
+    traits: '你喜欢动手，相信实打实做出来的东西才算数。你有耐心也有力气，愿意为了一件好作品反复打磨。你话不多，但交到你手里的事，最后总能变成一件拿得出手的成品。',
+    reason: '炼器既要有丹修的耐心，又要有剑修的力道，还得懂阵纹、懂材料。你的锋芒、沉稳与谋算刚好平衡，正是炼器宗师的料。',
+    hidden: '你的隐藏天赋是靠谱。你做出来的东西，别人用着放心。',
+    egg: '传说春秋时干将、莫邪夫妇为吴王铸剑，三年才成。而 1965 年出土的越王勾践剑，在地下埋了两千多年，出土时依然寒光闪闪、锋利无比。',
+    modern: '硬件工程师或者独立设计品牌主理人，做的东西能用一辈子。',
+    friend: { name: '天才剑修', line: '你铸的剑，在他手里才算真正活了。' },
+    foe: { name: '偷工减料的同行', line: '你最看不惯糊弄的活儿。' }
+  },
+  {
+    id: 'yushou', name: '御兽师', type: '灵兽', era: '万兽山', style: '一声呼哨，百兽来朝',
+    title: '驭灵使',
+    p: { 剑: 2, 丹: 5, 阵: 4, 灵: 9, 情: 8, 道: 3, 狂: 3 },
+    slogan: '我不是在驯服它们，我们只是彼此信任。',
+    tags: ['亲和力', '有耐心', '直觉准', '动物缘'],
+    traits: '你对身边的生命有天然的感知力，猫猫狗狗都喜欢黏着你。你温和、有耐心，善于察觉别人细微的情绪。你相信信任比命令更有力量，也愿意花时间去建立它。',
+    reason: '御兽之道不在力量，而在心意相通：读得懂灵兽的情绪，也给得起它们安全感。你的灵性和羁绊感，正是灵兽愿意追随的那种人。',
+    hidden: '你的隐藏天赋是读懂沉默。不会说话的生命、不爱说话的人，你都能读懂。',
+    egg: '《史记》记载，黄帝与炎帝在阪泉大战时，曾“教熊罴貔貅貙虎”上阵作战，算得上史书里最早的“御兽师”。',
+    modern: '兽医、动物保护者，或者把流浪猫都养成网红的博主。',
+    friend: { name: '护山神兽', line: '你们一见面，就像认识了很多年。' },
+    foe: { name: '偷猎者', line: '唯一能让温和的你瞬间翻脸的人。' }
+  },
+  {
+    id: 'yixiu', name: '医修', type: '丹器', era: '药王谷', style: '一针回春，一丹续命',
+    title: '妙手仙医',
+    p: { 剑: 1, 丹: 8, 阵: 3, 灵: 6, 情: 9, 道: 5, 狂: 1 },
+    slogan: '我修仙，是为了让更多人好好活着。',
+    tags: ['温柔', '治愈系', '心细', '有原则'],
+    traits: '你心软、细心，很容易察觉别人哪里不舒服。你习惯照顾人，也愿意花耐心去做那些看似不起眼、却真正有用的事。你看起来温柔好说话，但在原则问题上从不让步。',
+    reason: '医修不争斗、不夺宝，一身修为都用在救人上，要有丹修的耐心，更要有一颗不忍之心。你的羁绊感和沉稳，正是悬壶济世的仙医。',
+    hidden: '你的隐藏天赋是治愈力。哪怕什么都不做，只是待在你身边，别人也会觉得好受一些。',
+    egg: '东晋葛洪在《肘后备急方》里写道：“青蒿一握，以水二升渍，绞取汁，尽服之”，可以治疟疾。一千六百多年后，屠呦呦正是受这句话启发提取出青蒿素，获得了 2015 年诺贝尔生理学或医学奖。',
+    modern: '急诊科医生，或者那个总记得给大家带药的朋友。',
+    friend: { name: '炼丹宗师', line: '他炼丹，你用丹，配合得天衣无缝。' },
+    foe: { name: '不听医嘱的师兄', line: '每次受伤都说“小伤”，然后躺上半个月。' }
+  },
+  {
+    id: 'zhangmen', name: '一宗之主', type: '宗门', era: '宗门正殿', style: '执掌山门，护佑一方',
+    title: '掌门',
+    p: { 剑: 6, 丹: 4, 阵: 8, 灵: 3, 情: 7, 道: 7, 狂: 2 },
+    slogan: '我在，宗门就在。',
+    tags: ['有担当', '顾全大局', '护短', '稳重'],
+    traits: '你天生有责任感，习惯把身边的人护在身后。你考虑问题周全，能平衡各方的利益，也能在关键时刻做出艰难的决定。你未必爱出风头，但大家心里都清楚：有你在，就有主心骨。',
+    reason: '掌门要修为够高，更要有统筹全局的谋算、护住门人的情义和宠辱不惊的定力。这几样你都不缺，正是能撑起一个宗门的人。',
+    hidden: '你的隐藏天赋是凝聚力。你不需要大声号召，大家自然愿意聚在你身边。',
+    egg: '全真教掌教丘处机七十多岁时，带着弟子西行万里去见成吉思汗，劝他以“敬天爱民”为本、少行杀戮，后人称赞这是“一言止杀”。',
+    modern: '创业公司 CEO，做任何决定都会先想到老员工。',
+    friend: { name: '阵法大师', line: '有他布下的护山大阵，你才睡得着觉。' },
+    foe: { name: '魔尊', line: '正邪不两立，你们斗了几百年。' }
+  },
+  {
+    id: 'tuanchong', name: '宗门团宠', type: '宗门', era: '后山桃林', style: '万千宠爱，天真烂漫',
+    title: '小祖宗',
+    p: { 剑: 3, 丹: 2, 阵: 2, 灵: 8, 情: 10, 道: 3, 狂: 5 },
+    slogan: '我负责可爱，师兄师姐负责打架。',
+    tags: ['讨人喜欢', '真诚', '运气好', '小太阳'],
+    traits: '你真诚、热情、藏不住情绪，开心和难过都写在脸上。你很容易和人亲近，身边总有人愿意照顾你。你偶尔有点小任性，但你的真心和温暖，让人很难不喜欢你。',
+    reason: '修仙界最强的外挂不是天赋，而是一整个宗门的偏爱。你的羁绊感和灵性，加上那份可爱的不按常理出牌，正是让所有人都想护着的团宠体质。',
+    hidden: '你的隐藏天赋是让人卸下防备。再冷的人，在你面前也会忍不住软下来。',
+    egg: '《西游记》里，菩提祖师当众在孙悟空头上敲了三下，背着手走进里屋，关上中门。悟空悟出暗号，三更时分从后门溜进去，果然学到了长生之道。这大概是最早的“师父偏心小徒弟”。',
+    modern: '部门里最年轻的那个，大家都抢着给你带饭。',
+    friend: { name: '一宗之主', line: '嘴上骂你闯祸，转头就去替你收拾烂摊子。' },
+    foe: { name: '闭关', line: '师兄师姐一闭关就是三年，没人陪你玩了。' }
+  },
+  {
+    id: 'mozun', name: '魔尊', type: '妖魔', era: '魔域深渊', style: '不入正道，自成一派',
+    title: '万魔之主',
+    p: { 剑: 8, 丹: 2, 阵: 6, 灵: 3, 情: 4, 道: 1, 狂: 10 },
+    slogan: '天道不公，那我就自己当天。',
+    tags: ['叛逆', '霸气', '有野心', '不服输'],
+    traits: '你不喜欢被规则束缚，越是被告诉“不行”，越想证明“可以”。你有野心、有魄力，敢想敢做，也敢承担后果。你看起来不好惹，但对认可的人，其实意外地讲义气。',
+    reason: '魔尊走的是一条没人敢走的路：不守正道的规矩，只信自己的力量。你的不羁和锋芒，再加上一点谋算，正是能在魔域称王的气场。',
+    hidden: '你的隐藏天赋是打破常规。别人觉得天经地义的事，你偏要问一句：凭什么？',
+    egg: '相传“魔”字原本写作“磨”，用来翻译佛经里的“魔罗”，后来南朝梁武帝觉得魔属于鬼类，才把下面的“石”改成了“鬼”。',
+    modern: '颠覆整个行业规则的创业狂人，同行又怕他，又想成为他。',
+    friend: { name: '千年狐妖', line: '全修仙界，只有这位老朋友敢当面笑你。' },
+    foe: { name: '一宗之主', line: '斗了几百年，其实你们彼此最欣赏。' }
+  },
+  {
+    id: 'huyao', name: '千年狐妖', type: '妖魔', era: '青丘', style: '千年修行，一笑倾城',
+    title: '九尾',
+    p: { 剑: 2, 丹: 3, 阵: 6, 灵: 8, 情: 8, 道: 3, 狂: 8 },
+    slogan: '我活了一千年，最懂的就是人心。',
+    tags: ['魅力值高', '聪明', '看透人心', '随性'],
+    traits: '你很有魅力，懂得怎么让别人喜欢你，也很会察言观色。你聪明、敏感，表面上漫不经心，其实把一切都看在眼里。你重感情，但从不让自己受委屈。',
+    reason: '狐妖修行千年，见过太多人间悲欢，所以最懂人心，也最会保护自己。你的灵性、深情和那份随心所欲，正是青丘九尾的气质。',
+    hidden: '你的隐藏天赋是情绪智力。你能迅速读懂一个人，也知道怎么和不同的人相处。',
+    egg: '九尾狐最早出现在《山海经》里：青丘之山“有兽焉，其状如狐而九尾”。在汉代，它还是象征子孙兴旺的祥瑞，后来才慢慢成了“狐狸精”。',
+    modern: '时尚品牌主理人，或者让人一聊就停不下来的情感博主。',
+    friend: { name: '魔尊', line: '全修仙界，只有你敢当面笑他。' },
+    foe: { name: '捉妖道士', line: '他追了你三百年，你逗了他三百年。' }
+  },
+  {
+    id: 'sanxiu', name: '逍遥散修', type: '逍遥', era: '四海为家', style: '不入宗门，独自修行',
+    title: '闲云野鹤',
+    p: { 剑: 5, 丹: 3, 阵: 3, 灵: 7, 情: 3, 道: 7, 狂: 8 },
+    slogan: '天地这么大，何必困在一座山里。',
+    tags: ['自由', '独立', '随遇而安', '野路子'],
+    traits: '你独立、自由，不喜欢被组织和规矩捆住手脚。你习惯靠自己解决问题，走一条野路子也能走得很好。你对名利看得淡，对世界却充满好奇，总想去更远的地方看看。',
+    reason: '散修没有宗门庇护，也没有宗门束缚，全凭自己的悟性闯荡天地。你的不羁、灵性和清心，正适合这条自由却也孤独的路。',
+    hidden: '你的隐藏天赋是自给自足。不依赖任何人，也能把日子过得有声有色。',
+    egg: '诗仙李白其实是“持证”的道士：天宝年间，他在齐州紫极宫正式受了道箓，入了道籍。',
+    modern: '数字游民，背着电脑满世界找有 Wi-Fi 的海边。',
+    friend: { name: '隐世高人', line: '你在山里迷了路，他请你喝了一杯茶。' },
+    foe: { name: '招新长老', line: '每次见面都劝你入门，你每次都溜得飞快。' }
+  },
+  {
+    id: 'gaoren', name: '隐世高人', type: '逍遥', era: '藏经阁一角', style: '深藏不露，大道至简',
+    title: '扫地僧',
+    p: { 剑: 3, 丹: 6, 阵: 6, 灵: 5, 情: 3, 道: 10, 狂: 1 },
+    slogan: '我只是个扫地的，你们继续。',
+    tags: ['深藏不露', '低调', '通透', '定力强'],
+    traits: '你低调内敛，从不急着证明自己，可真到关键时刻，你的实力会让所有人吃惊。你看得通透，很少被情绪和外界左右。别人忙着争，你却在默默修炼，慢慢变强。',
+    reason: '真正的高手往往不在擂台上，而在藏经阁的角落里。你的清心、沉稳和谋算，正是深藏不露的隐世高人。',
+    hidden: '你的隐藏天赋是定力。外面再吵，你都能守住自己的节奏。',
+    egg: '《明史》记载，明太祖和明成祖都曾派人四处寻访武当道士张三丰，前后找了好些年都没找到。真正的高人，连皇帝都请不动。',
+    modern: '退休的技术大拿，平时在公园下棋，一出手就解决了全公司的难题。',
+    friend: { name: '逍遥散修', line: '你们在山里偶遇，一杯茶就成了忘年交。' },
+    foe: { name: '来挑战的年轻人', line: '每年都有人要找“藏经阁那个扫地的”比试。' }
+  },
+  {
+    id: 'busuanzi', name: '卜算子', type: '阵符', era: '天机阁', style: '观星问卦，知天命',
+    title: '天机先生',
+    p: { 剑: 2, 丹: 4, 阵: 8, 灵: 9, 情: 3, 道: 6, 狂: 2 },
+    slogan: '我能算到明天，却算不准人心。',
+    tags: ['直觉准', '想得远', '神秘', '洞察'],
+    traits: '你的直觉准得吓人，常常还没想清楚理由，就已经知道事情会怎么发展。你善于从细节里看出趋势，也习惯提前做好准备。你有点神秘，身边的人总觉得你“知道些什么”。',
+    reason: '卜算之道一半靠推演，一半靠灵觉，看的是天下大势，也是人心走向。你的灵性与谋算并重，正是天机阁最需要的人才。',
+    hidden: '你的隐藏天赋是预判。你总能比别人早一步看到风险和机会。',
+    egg: '词牌《卜算子》的名字，相传来自初唐诗人骆宾王：他写诗爱用数字，被人戏称为“卜算子”。',
+    modern: '数据分析师或者投资研究员，总能提前半年说中行业风向。',
+    friend: { name: '阵法大师', line: '他布阵，你算吉时，配合得天衣无缝。' },
+    foe: { name: '天机反噬', line: '泄露的天机太多，头发掉得特别快。' }
+  },
+  {
+    id: 'shenshou', name: '护山神兽', type: '灵兽', era: '宗门后山', style: '守山千年，护佑一方',
+    title: '镇山之宝',
+    p: { 剑: 8, 丹: 1, 阵: 1, 灵: 7, 情: 5, 道: 7, 狂: 4 },
+    slogan: '想动我的人？先问问我答不答应。',
+    tags: ['守护型', '忠诚', '战斗力强', '外冷内热'],
+    traits: '你对认定的人和地方有极强的守护欲，平时懒洋洋的，一旦有人越界，就会立刻亮出獠牙。你直觉敏锐、反应快，力量也很强。你不爱讲道理，但你的忠诚胜过千言万语。',
+    reason: '护山神兽与山门同生共息，不求名利，只守一方。你的灵性、锋芒和清心，加上那份护短的心，正是一宗之中最可靠的守护者。',
+    hidden: '你的隐藏天赋是威慑力。很多麻烦，光是看到你在场就自动退散了。',
+    egg: '故宫太和殿的屋脊上蹲着一排“脊兽”，从龙、凤、狮子一直排到行什，足足十只，是全国唯一一座脊兽数量达到十只的古建筑，象征最高等级。',
+    modern: '安保队长兼小区的“猫老大”，谁都不敢在你的地盘上撒野。',
+    friend: { name: '御兽师', line: '你们一见面，就像认识了很多年。' },
+    foe: { name: '偷灵果的小贼', line: '后山那棵灵果树，你守了三百年。' }
+  }
+];
+
+</script>
+<script>
+/* =========================================================
+ * 评分引擎（纯函数，不依赖页面）
+ * 1. 累加每个维度的原始分
+ * 2. 与“随机作答”的期望值比较，换算成标准分 z（消除各维度出现次数不同带来的偏差）
+ * 3. 把 z 向量与每个结果的画像原型做余弦相似度，取最接近者
+ * ========================================================= */
+var Engine = (function () {
+  var KEYS = DIMS.map(function (d) { return d.k; });
+
+  /* 随机作答时每个维度的期望与标准差（由题库自动算出，改题后无需手动调整） */
+  var STATS = (function () {
+    var mean = {}, variance = {};
+    KEYS.forEach(function (k) { mean[k] = 0; variance[k] = 0; });
+    QUESTIONS.forEach(function (q) {
+      var n = q.o.length;
+      KEYS.forEach(function (k) {
+        var s = 0, s2 = 0;
+        q.o.forEach(function (opt) { var v = opt[1][k] || 0; s += v; s2 += v * v; });
+        var m = s / n;
+        mean[k] += m;
+        variance[k] += s2 / n - m * m;
+      });
+    });
+    var sd = {};
+    KEYS.forEach(function (k) { sd[k] = Math.sqrt(variance[k]) || 1; });
+    return { mean: mean, sd: sd };
+  })();
+
+  function center(vec) {
+    var avg = KEYS.reduce(function (a, k) { return a + vec[k]; }, 0) / KEYS.length;
+    var out = {};
+    KEYS.forEach(function (k) { out[k] = vec[k] - avg; });
+    return out;
+  }
+
+  function cosine(a, b) {
+    var dot = 0, na = 0, nb = 0;
+    KEYS.forEach(function (k) { dot += a[k] * b[k]; na += a[k] * a[k]; nb += b[k] * b[k]; });
+    if (!na || !nb) return 0;
+    return dot / Math.sqrt(na * nb);
+  }
+
+  /* 人物原型：假设一个“性格如画像 p 的人”来答这 40 题（按 softmax 倾向选择），
+   * 计算他的期望标准分，作为该人物的匹配向量。这样原型与真实答题能落到的空间一致。 */
+  var PERSONA_BETA = 1.0;
+  function prototypeOf(f) {
+    var pc = center(f.p);
+    var raw = {};
+    KEYS.forEach(function (k) { raw[k] = 0; });
+    QUESTIONS.forEach(function (q) {
+      var u = q.o.map(function (opt) {
+        var s = 0;
+        Object.keys(opt[1]).forEach(function (k) { s += opt[1][k] / STATS.sd[k] * pc[k]; });
+        return s;
+      });
+      var mx = Math.max.apply(null, u);
+      var ex = u.map(function (x) { return Math.exp(PERSONA_BETA * (x - mx)); });
+      var tot = ex.reduce(function (a, b) { return a + b; }, 0);
+      q.o.forEach(function (opt, i) {
+        Object.keys(opt[1]).forEach(function (k) { raw[k] += ex[i] / tot * opt[1][k]; });
+      });
+    });
+    return center(zScores(raw));
+  }
+
+  var FIG_VECS = RESULTS.map(prototypeOf);
+
+  /* answers: 长度 40 的数组，每项为选项原始下标（0-3） */
+  function rawScores(answers) {
+    var s = {};
+    KEYS.forEach(function (k) { s[k] = 0; });
+    answers.forEach(function (ai, qi) {
+      if (ai === null || ai === undefined) return;
+      var pts = QUESTIONS[qi].o[ai][1];
+      Object.keys(pts).forEach(function (k) { s[k] += pts[k]; });
+    });
+    return s;
+  }
+
+  function zScores(raw) {
+    var z = {};
+    KEYS.forEach(function (k) { z[k] = (raw[k] - STATS.mean[k]) / STATS.sd[k]; });
+    return z;
+  }
+
+  /* 契合度百分比：相似度越高越接近 99% */
+  function toPercent(cos) {
+    var c = Math.max(0, Math.min(1, cos));
+    return Math.round(68 + 31 * Math.sqrt(c));
+  }
+
+  function rank(z) {
+    var u = center(z);
+    return RESULTS.map(function (f, i) {
+      var c = cosine(u, FIG_VECS[i]);
+      return { fig: f, cos: c, pct: toPercent(c) };
+    }).sort(function (a, b) { return b.cos - a.cos; });
+  }
+
+  /* 雷达图用：把 z 换算为 0-100 的展示分 */
+  function displayScores(z) {
+    var d = {};
+    KEYS.forEach(function (k) {
+      d[k] = Math.round(Math.max(10, Math.min(99, 52 + z[k] * 21)));
+    });
+    return d;
+  }
+
+  function evaluate(answers) {
+    var raw = rawScores(answers);
+    var z = zScores(raw);
+    var ranking = rank(z);
+    var order = KEYS.slice().sort(function (a, b) { return z[b] - z[a]; });
+    return {
+      raw: raw, z: z, display: displayScores(z),
+      ranking: ranking, best: ranking[0], second: ranking[1],
+      topDims: order.slice(0, 2), lowDim: order[order.length - 1]
+    };
+  }
+
+  return { KEYS: KEYS, STATS: STATS, evaluate: evaluate, rank: rank, zScores: zScores, rawScores: rawScores, cosine: cosine, center: center };
+})();
+
+</script>
+<script>
+/* =========================================================
+ * 古风人格测试 —— 通用交互逻辑
+ * 所有文案、标签、配色都来自 data.js 中的 CONFIG / DIMS / CHAPTERS / QUESTIONS / TYPES / RESULTS
+ * 流程：首页 → 逐题作答 → 分析 → 结果 → 海报 / 复制 / 图鉴 / 重新测试
+ * ========================================================= */
+(function () {
+  'use strict';
+
+  var C = CONFIG;
+  var TOTAL = QUESTIONS.length;
+  var MARKS = ['甲', '乙', '丙', '丁', '戊', '己'];
+  var STORE_KEY = 'ancientTest.' + C.id + '.v1';
+  var TYPE_ORDER = Object.keys(TYPES);
+  var FONT = '"Noto Serif SC","Noto Serif CJK SC","Source Han Serif SC","Source Han Serif CN","Songti SC","STSong","SimSun","Noto Serif CJK TC",serif';
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var state = null;      // { orders, answers, idx, done }
+  var busy = false;
+  var lastChapter = -1;
+  var lastResult = null;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  /* 模板替换：fmt('我是{name}', {name: '李白'}) */
+  function fmt(tpl, data) {
+    return String(tpl).replace(/\{(\w+)\}/g, function (m, k) { return data[k] !== undefined ? data[k] : m; });
+  }
+  function dimName(k) { for (var i = 0; i < DIMS.length; i++) if (DIMS[i].k === k) return DIMS[i].n; return k; }
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, reduceMotion ? 0 : ms); }); }
+
+  /* 1-99 转中文数字 */
+  function cn(n) {
+    var d = '〇一二三四五六七八九';
+    if (n <= 10) return n === 10 ? '十' : d[n];
+    if (n < 20) return '十' + d[n % 10];
+    return d[Math.floor(n / 10)] + '十' + (n % 10 ? d[n % 10] : '');
+  }
+  function cnDate() {
+    var now = new Date(), d = '〇一二三四五六七八九';
+    var y = String(now.getFullYear()).split('').map(function (c) { return d[+c]; }).join('');
+    return y + '年' + cn(now.getMonth() + 1) + '月';
+  }
+
+  /* ---------- 状态与本地存储 ---------- */
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function newState() {
+    return {
+      orders: QUESTIONS.map(function (q) { return shuffle(q.o.map(function (_, i) { return i; })); }),
+      answers: QUESTIONS.map(function () { return null; }),
+      idx: 0,
+      done: false
+    };
+  }
+  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* 无痕模式等情况忽略 */ } }
+  function clearSaved() { try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+  function load() {
+    try {
+      var s = JSON.parse(localStorage.getItem(STORE_KEY));
+      if (!s || !Array.isArray(s.orders) || !Array.isArray(s.answers)) return null;
+      if (s.orders.length !== TOTAL || s.answers.length !== TOTAL) return null;
+      for (var i = 0; i < TOTAL; i++) {
+        var n = QUESTIONS[i].o.length, ord = s.orders[i];
+        if (!Array.isArray(ord) || ord.length !== n) return null;
+        if (ord.slice().sort().join() !== QUESTIONS[i].o.map(function (_, k) { return k; }).join()) return null;
+        var a = s.answers[i];
+        if (a !== null && !(a >= 0 && a < n && a === Math.floor(a))) return null;
+      }
+      if (!(s.idx >= 0 && s.idx < TOTAL)) s.idx = 0;
+      s.done = !!s.done && s.answers.every(function (a) { return a !== null; });
+      return s;
+    } catch (e) { return null; }
+  }
+  function answeredCount(s) { return s.answers.filter(function (a) { return a !== null; }).length; }
+
+  /* ---------- 屏幕切换 ---------- */
+  function show(id) {
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) screens[i].classList.toggle('is-active', screens[i].id === id);
+    document.body.setAttribute('data-screen', id);
+    window.scrollTo(0, 0);
+  }
+
+  /* =========================================================
+   * 首页
+   * ========================================================= */
+  function initHome() {
+    var seals = $('typeSeals');
+    seals.style.setProperty('--n', TYPE_ORDER.length);
+    seals.innerHTML = TYPE_ORDER.map(function (t) {
+      return '<li style="--c:' + TYPES[t].color + '">' + t + '</li>';
+    }).join('');
+
+    $('homeRoll').innerHTML = TYPE_ORDER.map(function (t) {
+      var names = RESULTS.filter(function (f) { return f.type === t; }).map(function (f) { return esc(f.name); });
+      return '<p class="roll-col" style="--c:' + TYPES[t].color + '"><b>' + t + '</b>' + names.join('<i>·</i>') + '</p>';
+    }).join('');
+
+    refreshResume();
+  }
+
+  function refreshResume() {
+    var saved = load(), btn = $('btnResume');
+    if (saved && saved.done) {
+      btn.textContent = '查看上次的结果';
+      btn.hidden = false;
+    } else if (saved && answeredCount(saved) > 0) {
+      btn.textContent = '继续上次的作答（第 ' + (saved.idx + 1) + ' 问）';
+      btn.hidden = false;
+    } else {
+      btn.hidden = true;
+    }
+  }
+
+  function startNew() {
+    state = newState();
+    lastChapter = -1;
+    save();
+    show('quiz');
+    renderQuestion('none');
+  }
+
+  function resume() {
+    var saved = load();
+    if (!saved) { startNew(); return; }
+    state = saved;
+    lastChapter = -1;
+    if (state.done) { showResult(false); return; }
+    show('quiz');
+    renderQuestion('none');
+  }
+
+  /* =========================================================
+   * 答题
+   * ========================================================= */
+  function buildProgress() {
+    $('progress').style.gridTemplateColumns = 'repeat(' + CHAPTERS.length + ', 1fr)';
+    $('progress').setAttribute('aria-valuemax', TOTAL);
+    $('qTotal').textContent = '/ ' + TOTAL;
+    $('progress').innerHTML = CHAPTERS.map(function (c, ci) {
+      return '<div class="pg-seg" data-ch="' + ci + '"><div class="pg-bar"><i></i></div><span>' + c.name + '</span></div>';
+    }).join('');
+  }
+
+  function updateProgress() {
+    var segs = $('progress').children;
+    var curCh = QUESTIONS[state.idx].ch;
+    for (var ci = 0; ci < segs.length; ci++) {
+      var total = 0, done = 0;
+      for (var qi = 0; qi < TOTAL; qi++) {
+        if (QUESTIONS[qi].ch !== ci) continue;
+        total++;
+        if (state.answers[qi] !== null) done++;
+      }
+      segs[ci].querySelector('i').style.width = (total ? done / total * 100 : 0) + '%';
+      segs[ci].classList.toggle('is-current', ci === curCh);
+      segs[ci].classList.toggle('is-full', total > 0 && done === total);
+    }
+    var n = answeredCount(state);
+    $('progress').setAttribute('aria-valuenow', n);
+    $('progress').setAttribute('aria-valuetext', '已答 ' + n + ' 题，共 ' + TOTAL + ' 题');
+  }
+
+  function renderQuestion(dir) {
+    var qi = state.idx, q = QUESTIONS[qi], ch = CHAPTERS[q.ch];
+    var chEl = $('quizChapter');
+    $('chNo').textContent = ch.no;
+    $('chName').textContent = ch.name;
+    if (lastChapter !== q.ch) {
+      chEl.classList.remove('flash'); void chEl.offsetWidth; chEl.classList.add('flash');
+      chEl.title = ch.sub;
+      lastChapter = q.ch;
+    }
+    $('qNow').textContent = qi + 1;
+    $('qIndex').textContent = '第' + cn(qi + 1) + '问';
+    $('qText').textContent = q.q;
+    $('btnBack').textContent = qi === 0 ? '首页' : '上一问';
+
+    var picked = state.answers[qi];
+    $('qOptions').innerHTML = state.orders[qi].map(function (oi, pos) {
+      var on = picked === oi;
+      return '<li><button type="button" class="opt' + (on ? ' is-picked' : '') + '" data-oi="' + oi + '" aria-pressed="' + on + '">' +
+        '<span class="opt-mark" aria-hidden="true">' + MARKS[pos] + '</span><span class="opt-text">' + esc(q.o[oi][0]) + '</span></button></li>';
+    }).join('');
+
+    updateProgress();
+
+    var card = $('qCard');
+    card.classList.remove('out-left', 'out-right', 'in-left', 'in-right');
+    if (dir !== 'none' && !reduceMotion) { void card.offsetWidth; card.classList.add(dir === 'prev' ? 'in-left' : 'in-right'); }
+    try { $('qText').focus({ preventScroll: true }); } catch (e) {}
+  }
+
+  function leave(dir) {
+    var card = $('qCard');
+    card.classList.remove('in-left', 'in-right');
+    if (reduceMotion) return Promise.resolve();
+    card.classList.add(dir === 'prev' ? 'out-right' : 'out-left');
+    return wait(190);
+  }
+
+  function pick(oi) {
+    if (busy || !state) return;
+    busy = true;
+    var qi = state.idx;
+    state.answers[qi] = oi;
+    save();
+
+    var btns = $('qOptions').querySelectorAll('.opt');
+    for (var i = 0; i < btns.length; i++) {
+      var on = +btns[i].getAttribute('data-oi') === oi;
+      btns[i].classList.toggle('is-picked', on);
+      btns[i].setAttribute('aria-pressed', on);
+      if (on) btns[i].classList.add('just-picked');
+    }
+    updateProgress();
+
+    wait(260).then(function () {
+      if (qi < TOTAL - 1) {
+        return leave('next').then(function () {
+          state.idx = qi + 1;
+          save();
+          renderQuestion('next');
+        });
+      }
+      var firstEmpty = state.answers.indexOf(null);
+      if (firstEmpty !== -1) {            // 理论上不会发生：有漏答则跳回
+        state.idx = firstEmpty; save(); renderQuestion('prev'); return;
+      }
+      return finish();
+    }).then(function () { busy = false; }, function () { busy = false; });
+  }
+
+  function back() {
+    if (busy || !state) return;
+    if (state.idx === 0) { save(); refreshResume(); show('home'); return; }
+    busy = true;
+    leave('prev').then(function () {
+      state.idx -= 1;
+      save();
+      renderQuestion('prev');
+      busy = false;
+    });
+  }
+
+  /* =========================================================
+   * 分析 → 结果
+   * ========================================================= */
+  function finish() {
+    state.done = true;
+    save();
+    show('loading');
+    var el = $('loadingText');
+    var p = Promise.resolve();
+    C.loading.forEach(function (t) {
+      p = p.then(function () { el.textContent = t; return wait(650); });
+    });
+    return p.then(function () { showResult(true); });
+  }
+
+  function radarSVG(scores, top, color) {
+    var K = Engine.KEYS, n = K.length;
+    var cx = 170, cy = 150, R = 100;
+    function ang(i) { return -Math.PI / 2 + i * 2 * Math.PI / n; }
+    function pt(i, r) { return [cx + r * Math.cos(ang(i)), cy + r * Math.sin(ang(i))]; }
+    function poly(r) { return K.map(function (_, i) { var p = pt(i, r); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' '); }
+
+    var s = '<svg viewBox="0 0 340 300" role="img" aria-label="' + esc(C.radarLabel) + '雷达图：' +
+      K.map(function (k) { return dimName(k) + scores[k]; }).join('，') + '">';
+    [0.25, 0.5, 0.75, 1].forEach(function (f, i) {
+      s += '<polygon points="' + poly(R * f) + '" fill="' + (i === 3 ? 'rgba(255,255,255,.5)' : 'none') + '" stroke="rgba(31,39,36,' + (i === 3 ? .28 : .12) + ')" stroke-width="1"/>';
+    });
+    K.forEach(function (_, i) {
+      var p = pt(i, R);
+      s += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="rgba(31,39,36,.12)"/>';
+    });
+    var user = K.map(function (k, i) { var p = pt(i, R * scores[k] / 100); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+    s += '<polygon points="' + user + '" fill="' + color + '" fill-opacity=".2" stroke="' + color + '" stroke-width="2" stroke-linejoin="round"/>';
+    K.forEach(function (k, i) {
+      var p = pt(i, R * scores[k] / 100);
+      s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.2" fill="' + color + '"/>';
+    });
+    K.forEach(function (k, i) {
+      var p = pt(i, R + 24), c = Math.cos(ang(i));
+      var anchor = c > 0.3 ? 'start' : (c < -0.3 ? 'end' : 'middle');
+      var hot = top.indexOf(k) !== -1;
+      var dy = Math.sin(ang(i)) > 0.5 ? 12 : (Math.sin(ang(i)) < -0.5 ? -2 : 5);
+      s += '<text x="' + p[0].toFixed(1) + '" y="' + (p[1] + dy).toFixed(1) + '" text-anchor="' + anchor + '" font-size="14" font-family=\'' + FONT + '\' fill="' + (hot ? color : '#4E5A56') + '"' + (hot ? ' font-weight="700"' : '') + '>' +
+        dimName(k) + '<tspan font-size="12" dx="4" fill="' + (hot ? color : '#85918C') + '">' + scores[k] + '</tspan></text>';
+    });
+    return s + '</svg>';
+  }
+
+  function topDimsOf(f) {
+    return Engine.KEYS.slice().sort(function (a, b) { return f.p[b] - f.p[a]; }).slice(0, 2);
+  }
+
+  function dynamicReason(r) {
+    var f = r.best.fig, top = r.topDims, ft = topDimsOf(f);
+    var overlap = top.filter(function (k) { return ft.indexOf(k) !== -1; });
+    var data = { a: dimName(top[0]), b: dimName(top[1]), name: f.name, dim: overlap.length ? dimName(overlap[0]) : '' };
+    var tail = overlap.length === 2 ? C.reason.both : (overlap.length === 1 ? C.reason.one : C.reason.none);
+    return fmt(C.reason.lead + tail, data);
+  }
+
+  function showResult(animate) {
+    var r = Engine.evaluate(state.answers);
+    lastResult = r;
+    var f = r.best.fig, t = TYPES[f.type];
+    var sec = r.second;
+    var secPct = Math.min(sec.pct, r.best.pct - 1);
+    var card = $('resultCard');
+    var S = C.sections;
+    card.style.setProperty('--type', t.color);
+    card.style.setProperty('--type-soft', t.soft);
+    document.documentElement.style.setProperty('--type-soft', t.soft);
+
+    var nameLen = Array.from ? Array.from(f.name).length : f.name.length;
+    var facts = C.facts.map(function (pair) {
+      return '<span>' + pair[0] + '<b>' + esc(f[pair[1]]) + '</b></span>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="rc-head">' +
+        '<div class="rc-left">' +
+          '<p class="rc-pre">' + esc(C.resultPre) + '</p>' +
+          '<p class="rc-type"><b>' + f.type + '</b>' + esc(f.title) + '</p>' +
+          '<p class="rc-slogan">「' + esc(f.slogan) + '」</p>' +
+          '<p class="rc-match"><span>' + esc(C.matchLabel) + '</span><b>' + r.best.pct + '<small>%</small></b></p>' +
+        '</div>' +
+        '<div class="rc-slip len-' + Math.min(nameLen, 6) + '">' +
+          '<h2 class="rc-name">' + esc(f.name) + '</h2>' +
+          '<p class="rc-style">' + esc(f.style.replace(/，/g, '　')) + '</p>' +
+          '<span class="seal rc-seal" style="background:' + t.color + ';box-shadow:inset 0 0 0 2px ' + t.color + ',inset 0 0 0 3.5px rgba(251,244,236,.85)" aria-hidden="true">' + f.type + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<p class="rc-facts">' + facts + '</p>' +
+      '<ul class="rc-tags">' + f.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+      '<div class="rc-radar">' + radarSVG(r.display, r.topDims, t.color) +
+        '<p class="rc-radar-note">' + esc(C.radarLabel) + '：<b>' + dimName(r.topDims[0]) + '</b>与<b>' + dimName(r.topDims[1]) + '</b>最强</p></div>' +
+      '<section class="rc-sec"><h3>' + S.traits + '</h3><p>' + esc(f.traits) + '</p></section>' +
+      '<section class="rc-sec"><h3>' + S.reason + '</h3><p class="rc-dyn">' + esc(dynamicReason(r)) + '</p><p>' + esc(f.reason) + '</p></section>' +
+      '<section class="rc-sec"><h3>' + S.hidden + '</h3><p>' + esc(f.hidden) + '</p></section>' +
+      '<section class="rc-sec rc-egg"><h3>' + S.egg + '</h3><p>' + esc(f.egg) + '</p></section>' +
+      '<section class="rc-sec"><h3>' + S.modern + '</h3><p>' + esc(f.modern) + '</p></section>' +
+      '<div class="rc-rel">' +
+        '<div class="rel-friend"><em class="seal" aria-hidden="true">' + C.rel[0].seal + '</em><strong>' + esc(f.friend.name) + '</strong><span class="sr-only">（' + C.rel[0].label + '）</span><p>' + esc(f.friend.line) + '</p></div>' +
+        '<div class="rel-foe"><em class="seal" aria-hidden="true">' + C.rel[1].seal + '</em><strong>' + esc(f.foe.name) + '</strong><span class="sr-only">（' + C.rel[1].label + '）</span><p>' + esc(f.foe.line) + '</p></div>' +
+      '</div>' +
+      '<p class="rc-second">' + esc(fmt(C.second, { type: sec.fig.type })) + '<b>' + esc(sec.fig.name) + '</b>（契合度 ' + secPct + '%）</p>' +
+      '<div class="rc-foot"><b>' + esc(C.title) + '</b><span>' + cnDate() + '</span></div>';
+
+    card.classList.remove('reveal');
+    show('result');
+    if (animate && !reduceMotion) { void card.offsetWidth; card.classList.add('reveal'); }
+    buildGallery(f.id);
+  }
+
+  /* =========================================================
+   * 分享海报（Canvas 绘制，1080×1440，适配小红书 3:4）
+   * ========================================================= */
+  var NO_LINE_START = '，。！？、；：”’」』）》…—';
+  function wrap(ctx, text, maxW) {
+    var lines = [], line = '';
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i], test = line + ch;
+      if (ctx.measureText(test).width > maxW && line && NO_LINE_START.indexOf(ch) === -1) {
+        lines.push(line); line = ch;
+      } else line = test;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+  function rrect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+  }
+  function fitFont(ctx, text, weight, size, min, maxW) {
+    ctx.font = weight + ' ' + size + 'px ' + FONT;
+    while (ctx.measureText(text).width > maxW && size > min) { size -= 1; ctx.font = weight + ' ' + size + 'px ' + FONT; }
+    return size;
+  }
+
+  function drawPoster(r) {
+    var f = r.best.fig, t = TYPES[f.type];
+    var W = 1080, H = 1440;
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext('2d');
+    ctx.textBaseline = 'alphabetic';
+    var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#E4EBE6';
+
+    // 底与框
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(31,39,36,.18)'; ctx.lineWidth = 2; ctx.strokeRect(44, 44, W - 88, H - 88);
+    ctx.fillStyle = '#F7F6F0'; ctx.fillRect(60, 60, W - 120, H - 120);
+    ctx.fillStyle = t.color; ctx.fillRect(60, 60, W - 120, 12);
+
+    // 页眉
+    ctx.fillStyle = '#85918C'; ctx.textAlign = 'left';
+    fitFont(ctx, C.title, '400', 28, 20, 600);
+    ctx.fillText(C.title, 120, 150);
+
+    // 左栏
+    ctx.fillStyle = '#4E5A56'; fitFont(ctx, C.resultPre, '400', 34, 24, 580);
+    ctx.fillText(C.resultPre, 120, 236);
+    ctx.fillStyle = t.color; ctx.font = '700 66px ' + FONT;
+    ctx.fillText(f.type, 120, 322);
+    var tw = ctx.measureText(f.type).width;
+    ctx.fillStyle = '#4E5A56'; fitFont(ctx, f.title, '400', 36, 22, 600 - tw - 24);
+    ctx.fillText(f.title, 120 + tw + 24, 320);
+
+    ctx.fillStyle = '#1F2724'; ctx.font = '700 54px ' + FONT;
+    var sl = wrap(ctx, '「' + f.slogan + '」', 580);
+    var y = 420;
+    sl.forEach(function (l) { ctx.fillText(l, 112, y); y += 80; });
+
+    var my = Math.max(y + 56, 620);
+    ctx.fillStyle = '#85918C'; ctx.font = '400 30px ' + FONT;
+    ctx.fillText(C.matchLabel, 120, my);
+    ctx.fillStyle = t.color; ctx.font = '900 120px ' + FONT;
+    ctx.fillText(String(r.best.pct), 112, my + 120);
+    var pw = ctx.measureText(String(r.best.pct)).width;
+    ctx.font = '700 52px ' + FONT; ctx.fillText('%', 118 + pw, my + 118);
+
+    // 右侧题签（竖排名称，按字数自适应字号）
+    var sx = 752, sy = 150, sw = 196, sh = 560;
+    ctx.fillStyle = '#FFFEFA'; ctx.fillRect(sx, sy, sw, sh);
+    ctx.strokeStyle = '#1F2724'; ctx.lineWidth = 4; ctx.strokeRect(sx, sy, sw, sh);
+    ctx.lineWidth = 1.5; ctx.strokeRect(sx + 12, sy + 12, sw - 24, sh - 24);
+    var name = Array.from ? Array.from(f.name) : f.name.split('');
+    var fs = Math.min(112, Math.floor((sh - 90) / name.length) - 8);
+    ctx.fillStyle = '#1F2724'; ctx.font = '900 ' + fs + 'px ' + FONT; ctx.textAlign = 'center';
+    var nx = sx + sw - 74, ny = sy + 36 + fs;
+    name.forEach(function (c, i) { ctx.fillText(c, nx, ny + i * (fs + 8)); });
+    var st = f.style.replace(/，/g, '　').split('');
+    var stSize = Math.min(24, Math.floor((sh - 90) / Math.max(st.length, 1)) - 6);
+    ctx.fillStyle = '#4E5A56'; ctx.font = '400 ' + stSize + 'px ' + FONT;
+    st.forEach(function (c, i) { ctx.fillText(c, sx + 46, sy + 42 + stSize + i * (stSize + 8)); });
+
+    // 印章
+    ctx.save();
+    ctx.translate(sx - 6, sy + sh - 40);
+    ctx.rotate(-6 * Math.PI / 180);
+    ctx.fillStyle = t.color; rrect(ctx, -50, -50, 100, 100, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(251,244,236,.85)'; ctx.lineWidth = 2.5; rrect(ctx, -42, -42, 84, 84, 5); ctx.stroke();
+    ctx.fillStyle = '#FBF4EC'; ctx.font = '700 36px ' + FONT;
+    ctx.fillText(f.type[0], 0, -6); ctx.fillText(f.type[1] || '', 0, 34);
+    ctx.restore();
+
+    // 分隔
+    var by = 900;
+    ctx.strokeStyle = 'rgba(31,39,36,.16)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(120, by - 30); ctx.lineTo(960, by - 30); ctx.stroke();
+
+    // 雷达
+    var K = Engine.KEYS, n = K.length, cx = 320, cy = by + 170, R = 132;
+    function P(i, rr) { var a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + rr * Math.cos(a), cy + rr * Math.sin(a)]; }
+    [0.25, 0.5, 0.75, 1].forEach(function (fr) {
+      ctx.beginPath();
+      K.forEach(function (_, i) { var p = P(i, R * fr); if (i) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); });
+      ctx.closePath();
+      ctx.strokeStyle = fr === 1 ? 'rgba(31,39,36,.3)' : 'rgba(31,39,36,.12)'; ctx.lineWidth = 2; ctx.stroke();
+    });
+    ctx.beginPath();
+    K.forEach(function (k, i) { var p = P(i, R * r.display[k] / 100); if (i) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); });
+    ctx.closePath();
+    ctx.globalAlpha = .22; ctx.fillStyle = t.color; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = t.color; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.stroke();
+    K.forEach(function (k, i) {
+      var p = P(i, R + 44), a = -Math.PI / 2 + i * 2 * Math.PI / n, c = Math.cos(a);
+      ctx.textAlign = c > 0.3 ? 'left' : (c < -0.3 ? 'right' : 'center');
+      var hot = r.topDims.indexOf(k) !== -1;
+      ctx.fillStyle = hot ? t.color : '#4E5A56';
+      ctx.font = (hot ? '700 ' : '400 ') + '28px ' + FONT;
+      ctx.fillText(dimName(k), p[0], p[1] + 10);
+    });
+
+    // 右栏：隐藏优势 + 标签
+    ctx.textAlign = 'left';
+    var rx = 600;
+    ctx.fillStyle = t.color; ctx.font = '700 28px ' + FONT;
+    ctx.fillText(C.sections.hidden, rx, by + 20);
+    ctx.fillStyle = '#1F2724'; ctx.font = '700 36px ' + FONT;
+    var hid = f.hidden.split('。')[0] + '。';
+    var hl = wrap(ctx, hid, 370), hy = by + 80;
+    hl.slice(0, 3).forEach(function (l) { ctx.fillText(l, rx, hy); hy += 54; });
+    var ty = Math.max(hy + 10, by + 200);
+    f.tags.forEach(function (tag, i) {
+      var col = i % 2, row = Math.floor(i / 2);
+      var x = rx + col * 186, yy = ty + row * 74;
+      ctx.fillStyle = t.soft; ctx.fillRect(x, yy, 172, 58);
+      var size = fitFont(ctx, tag, '400', 28, 16, 152);
+      ctx.fillStyle = t.color; ctx.textAlign = 'center';
+      ctx.fillText(tag, x + 86, yy + 29 + size * 0.38);
+    });
+
+    // 页脚
+    ctx.fillStyle = '#1F2724'; ctx.fillRect(60, H - 150, W - 120, 90);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#F7F6F0';
+    var foot = fmt(C.posterFoot, { name: f.name, type: f.type });
+    fitFont(ctx, foot, '400', 30, 20, 620);
+    ctx.fillText(foot, 110, H - 93);
+    ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(247,246,240,.7)'; ctx.font = '400 24px ' + FONT;
+    ctx.fillText(cnDate(), W - 110, H - 94);
+
+    return cv;
+  }
+
+  function openPoster() {
+    if (!lastResult) return;
+    var go = function () {
+      var url;
+      try { url = drawPoster(lastResult).toDataURL('image/png'); }
+      catch (e) { toast('海报生成失败，请直接截图分享'); return; }
+      $('posterImg').src = url;
+      $('posterDownload').href = url;
+      $('posterDownload').setAttribute('download', C.shortName + '-' + lastResult.best.fig.name + '.png');
+      openModal('posterModal');
+    };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go, go); else go();
+  }
+
+  /* ---------- 复制文案 ---------- */
+  function copyText() {
+    if (!lastResult) return;
+    var f = lastResult.best.fig;
+    var text = fmt(C.copy, { name: f.name, type: f.type, title: f.title }) + '\n' +
+      '「' + f.slogan + '」\n' +
+      C.matchLabel + ' ' + lastResult.best.pct + '%，最强维度：' + dimName(lastResult.topDims[0]) + '、' + dimName(lastResult.topDims[1]) + '\n' +
+      C.copyAsk + ' #' + C.title;
+    var done = function () { toast('结果文案已复制'); };
+    var fallback = function () {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      if (ok) done(); else toast('复制失败，请长按结果手动复制');
+    };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+  }
+
+  /* ---------- 图鉴 ---------- */
+  function buildGallery(meId) {
+    $('galleryBody').innerHTML = TYPE_ORDER.map(function (tp) {
+      var items = RESULTS.filter(function (f) { return f.type === tp; }).map(function (f) {
+        var me = f.id === meId;
+        return '<div class="g-item' + (me ? ' is-me' : '') + '"><strong>' + esc(f.name) + (me ? '<span class="g-me" title="你的结果">你</span>' : '') + '<small>' + esc(f.title) + '</small></strong><p>' + esc(f.slogan) + '</p></div>';
+      }).join('');
+      return '<div class="g-group" style="--c:' + TYPES[tp].color + '"><h3>' + tp + '</h3>' + items + '</div>';
+    }).join('');
+  }
+
+  /* ---------- 弹层与提示 ---------- */
+  var lastFocus = null;
+  function openModal(id) {
+    lastFocus = document.activeElement;
+    var m = $(id);
+    m.hidden = false;
+    document.body.style.overflow = 'hidden';
+    var first = m.querySelector('[data-close]');
+    if (first) first.focus();
+  }
+  function closeModal(m) {
+    m.hidden = true;
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2000);
+  }
+
+  /* =========================================================
+   * 事件绑定
+   * ========================================================= */
+  function bind() {
+    $('btnStart').addEventListener('click', startNew);
+    $('btnResume').addEventListener('click', resume);
+    $('btnBack').addEventListener('click', back);
+    $('qOptions').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.opt') : null;
+      if (b) pick(+b.getAttribute('data-oi'));
+    });
+    $('btnPoster').addEventListener('click', openPoster);
+    $('btnCopy').addEventListener('click', copyText);
+    $('btnGallery').addEventListener('click', function () { openModal('galleryModal'); });
+    $('btnRestart').addEventListener('click', function () { clearSaved(); startNew(); });
+
+    var modals = document.querySelectorAll('.modal');
+    Array.prototype.forEach.call(modals, function (m) {
+      m.addEventListener('click', function (e) {
+        if (e.target === m || (e.target.closest && e.target.closest('[data-close]'))) closeModal(m);
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      var open = document.querySelector('.modal:not([hidden])');
+      if (open) { if (e.key === 'Escape') closeModal(open); return; }
+      if (document.body.getAttribute('data-screen') !== 'quiz') return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      var num = parseInt(e.key, 10);
+      if (num >= 1 && num <= 4) {
+        var btn = $('qOptions').querySelectorAll('.opt')[num - 1];
+        if (btn) { e.preventDefault(); pick(+btn.getAttribute('data-oi')); }
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+        e.preventDefault(); back();
+      }
+    });
+  }
+
+  buildProgress();
+  initHome();
+  bind();
+  document.body.setAttribute('data-screen', 'home');
+})();
+
+</script>
+</body>
+</html>
